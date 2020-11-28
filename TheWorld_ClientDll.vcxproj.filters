@@ -24,6 +24,9 @@
     <ClInclude Include="TheWorld_ClientDll.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TheWorld_MyClientApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -35,7 +38,10 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\KBEngine\kbengine-1.0.0\kbe\src\lib\python\Modules\getbuildinfo.c">
+    <ClCompile Include="..\..\KBEngine\kbengine\kbe\src\lib\python\Modules\getbuildinfo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TheWorld_MyClientApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

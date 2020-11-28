@@ -66,6 +66,8 @@ KBE_DLL_API KBEngine::uint32 kbe_getSystemTime();
 KBE_DLL_API bool kbe_login(const char* accountName, const char* passwd, const char* datas = NULL, KBEngine::uint32 datasize = 0,
 	const char* ip = NULL, KBEngine::uint32 port = 0);
 
+KBE_DLL_API void kbe_reset(void);
+
 /**
 */
 KBE_DLL_API void kbe_update();
@@ -118,5 +120,17 @@ KBE_DLL_API const char* kbe_getPyUserResPath();
 /**
 */
 KBE_DLL_API void kbe_shutdown(void);
+
+enum KBEMessageType
+{
+	Print,
+	Debug,
+	warning,
+	Info,
+	Error,
+	Critical
+};
+
+KBE_DLL_API void kbe_printMessage(char *message, KBEMessageType m = Print);
 
 //#endif // __KBENGINE_DLL__
