@@ -7,6 +7,7 @@
 #pragma warning(disable : 4049)
 
 #include "targetver.h"
+#include "client_lib/clientobjectbase.h"
 
 #ifdef WIN32_LEAN_AND_MEAN
 #else
@@ -137,5 +138,9 @@ enum KBEMessageType
 };
 
 KBE_DLL_API void kbe_printMessage(char *message, KBEMessageType m = Print);
+
+KBE_DLL_API KBEngine::client::Entity* kbe_findEntity(KBEngine::ENTITY_ID eid);
+
+KBE_DLL_API bool kbe_isOnGround(KBEngine::ENTITY_ID eid);
 
 //#endif // __KBENGINE_DLL__
