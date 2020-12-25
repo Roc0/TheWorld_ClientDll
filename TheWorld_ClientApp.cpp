@@ -14,6 +14,9 @@ TheWorld_ClientApp::TheWorld_ClientApp() :
 {
 	m_bDoSleepInMainLoop = true;
 	m_iLogin = LOGIN_NOT_DONE;
+
+	m_pSpaceWorld = new SpaceWorld;
+	m_pPlayerEntity = m_pTargetEntity = m_pMouseTarget = NULL;
 }
 
 TheWorld_ClientApp::~TheWorld_ClientApp()
@@ -218,5 +221,22 @@ void TheWorld_ClientApp::kbengine_MessagePump(TheWorld_ClientApp* clientApp)
 		}
 
 		m_bDoSleepInMainLoop = true;
+	}
+}
+
+void TheWorld_ClientApp::kbengine_UpdateVolatile(void)
+{
+	KBEntity* pPlayer = getPlayerEntity();
+	if (pPlayer != NULL)
+	{
+		KBEngine::ENTITY_ID eid = (getTargetEntity() == NULL ? -1 : getTargetEntity()->id());
+		float x = 0, y = 0, z = 0, yaw = 0, pitch = 0, roll = 0;
+		pPlayer->getDesideredPosition(x, y, z);
+		pPlayer->getDesideredDirection(yaw, pitch, roll);
+
+		kbe_updateVolatile(eid, x, y, z, yaw, pitch, roll);
+
+		pPlayer->setPosition(x, y, z);
+		pPlayer->setDirection(yaw, pitch, roll);
 	}
 }
