@@ -42,7 +42,9 @@ public:
 	virtual void kbengine_UpdateVolatile(void);
 	// *** KBEngine interaction ***
 
-	virtual void client_onEvent(const KBEngine::EventData* lpEventData) = 0;
+	//virtual void setMain(TheWorld_ClientApp* pMain) { m_pMain = pMain; };
+
+	virtual void client_onEvent(const KBEngine::EventData* lpEventData);
 
 	virtual void clearEntities(void) { m_Entities.clear(); };
 	virtual int eraseEntity(KBEngine::ENTITY_ID eid) { return m_Entities.erase(eid); };
@@ -84,6 +86,45 @@ public:
 			return iter->second.get();
 	}
 
+	// config AppMode
+	enum _AppMode
+	{
+		InitialMenu,
+		WorldMode
+	};
+	virtual void setAppMode(enum TheWorld_ClientApp::_AppMode r, bool bForce = false)
+	{
+		if (m_appMode != r || bForce)
+		{
+			m_appMode = r;
+			m_bInitAppModeRequired = true;
+		}
+	};
+	virtual enum TheWorld_ClientApp::_AppMode getAppMode(void) { return m_appMode; };
+	virtual bool getInitAppModeRequired(void) { return m_bInitAppModeRequired; };
+	virtual void setInitAppModeRequired(bool b) { m_bInitAppModeRequired = b; };
+	virtual bool getReinitAppModeRequired(void) { return m_bReinitAppModeRequired; };
+	virtual void setReinitAppModeRequired(bool b) { m_bReinitAppModeRequired = b; };
+	// config AppMode
+
+	virtual void setShutdownRequired(bool b) { m_bShutDown = b; };
+	virtual bool getShutdownRequired(void) { return m_bShutDown; };
+
+	bool playerEnterSpace(KBEngine::SPACE_ID spaceID)
+	{
+		m_bReinitAppModeRequired = true;
+		getSpaceWorld()->setPlayerSpaceId(spaceID);
+		return true;
+	};
+
+	void playerLeaveSpace(KBEngine::SPACE_ID spaceID)
+	{
+		if (getSpaceWorld()->getPlayerSpaceId() != spaceID)
+			return;
+		getSpaceWorld()->setPlayerSpaceId(-1);
+		m_bReinitAppModeRequired = true;
+	};
+
 	virtual void setDoSleepInMainLoop(bool b) { m_bDoSleepInMainLoop = b; };
 	virtual bool getDoSleepInMainLoop(void) { return m_bDoSleepInMainLoop; };
 	virtual void setLoginStatus(int i) { m_iLogin = i; };
@@ -102,6 +143,12 @@ public:
 	virtual KBEntity* getMouseTarget(void) { return m_pMouseTarget; }
 
 private:
+	//TheWorld_ClientApp* m_pMain;
+	bool m_bShutDown;
+	enum TheWorld_ClientApp::_AppMode m_appMode;
+	bool m_bInitAppModeRequired;
+	bool m_bReinitAppModeRequired;
+
 	std::queue< std::tr1::shared_ptr<const KBEngine::EventData> > events_;
 	boost::mutex m_KbeEventsMutex;
 	bool m_bDoSleepInMainLoop;

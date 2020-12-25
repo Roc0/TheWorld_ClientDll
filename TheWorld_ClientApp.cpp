@@ -1,5 +1,6 @@
 #include "TheWorld_ClientApp.h"
 
+#include <json/json.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/thread/thread.hpp>
 
@@ -17,6 +18,13 @@ TheWorld_ClientApp::TheWorld_ClientApp() :
 
 	m_pSpaceWorld = new SpaceWorld;
 	m_pPlayerEntity = m_pTargetEntity = m_pMouseTarget = NULL;
+
+	m_bInitAppModeRequired = true;
+	m_bReinitAppModeRequired = false;
+
+	setShutdownRequired(false);
+
+	//m_pMain = NULL;
 }
 
 TheWorld_ClientApp::~TheWorld_ClientApp()
@@ -239,4 +247,577 @@ void TheWorld_ClientApp::kbengine_UpdateVolatile(void)
 		pPlayer->setPosition(x, y, z);
 		pPlayer->setDirection(yaw, pitch, roll);
 	}
+}
+
+void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
+{
+	char str[256];
+
+	switch (lpEventData->id)
+	{
+	case CLIENT_EVENT_ENTERWORLD:
+	{
+		const KBEngine::EventData_EnterWorld* pEventData_EnterWorld = static_cast<const KBEngine::EventData_EnterWorld*>(lpEventData);
+		KBEngine::ENTITY_ID eid = pEventData_EnterWorld->entityID;
+
+		bool bPlayer = false;
+		KBEntity* pEntity = getEntity(eid, bPlayer);
+
+		if (!pEntity)
+		{
+			bool bPlayer = false;
+			if (kbengine_PlayerID() == eid)
+				bPlayer = true;
+			sprintf(str, "KBE Event received ==> CLIENT_EVENT_ENTERWORLD - %s - EntityID: %d (NOT IN LIST), SpaceID: %d, Yaw/Pitch/Roll: %f/%f/%f, X/Y/Z: %f/%f/%f, Speed: %f, IsOnGround: %d, Res: %s\n", bPlayer ? "PLAYER" : "OTHER",
+				(int)pEventData_EnterWorld->entityID, (int)pEventData_EnterWorld->spaceID,
+				pEventData_EnterWorld->yaw, pEventData_EnterWorld->pitch, pEventData_EnterWorld->roll,
+				pEventData_EnterWorld->x, pEventData_EnterWorld->y, pEventData_EnterWorld->z,
+				pEventData_EnterWorld->speed, pEventData_EnterWorld->isOnGround, pEventData_EnterWorld->res.c_str());
+			kbengine_PrintMessage(str, true);
+			break;
+		}
+
+		if (bPlayer)
+			setPlayerEntity(pEntity);
+
+		pEntity->setPosition(pEventData_EnterWorld->x, pEventData_EnterWorld->y, pEventData_EnterWorld->z);
+		if (bPlayer)
+			pEntity->setDesideredPosition(pEventData_EnterWorld->x, pEventData_EnterWorld->y, pEventData_EnterWorld->z);
+		pEntity->setDirection(pEventData_EnterWorld->yaw, pEventData_EnterWorld->pitch, pEventData_EnterWorld->roll);
+		if (bPlayer)
+			pEntity->setDesideredDirection(pEventData_EnterWorld->yaw, pEventData_EnterWorld->pitch, pEventData_EnterWorld->roll);
+		pEntity->setMoveSpeed(pEventData_EnterWorld->speed);
+		pEntity->setSpaceID(pEventData_EnterWorld->spaceID);
+		pEntity->setIsOnGround(pEventData_EnterWorld->isOnGround);
+		pEntity->setRes(pEventData_EnterWorld->res);
+
+		pEntity->setIsInWorld(true);
+
+		sprintf(str, "KBE Event received ==> CLIENT_EVENT_ENTERWORLD - %s - EntityID: %d, SpaceID: %d, Yaw/Pitch/Roll: %f/%f/%f, X/Y/Z: %f/%f/%f, Speed: %f, IsOnGround: %d, Res: %s\n", bPlayer ? "PLAYER" : "OTHER",
+			(int)pEventData_EnterWorld->entityID, (int)pEventData_EnterWorld->spaceID,
+			pEventData_EnterWorld->yaw, pEventData_EnterWorld->pitch, pEventData_EnterWorld->roll,
+			pEventData_EnterWorld->x, pEventData_EnterWorld->y, pEventData_EnterWorld->z,
+			pEventData_EnterWorld->speed, pEventData_EnterWorld->isOnGround, pEventData_EnterWorld->res.c_str());
+		kbengine_PrintMessage(str, true);
+
+		//if (bPlayer)
+		//	setAppMode(TheWorld_ClientApp_GL::GraphicMode);
+	}
+	break;
+
+	case CLIENT_EVENT_LEAVEWORLD:
+	{
+		KBEngine::ENTITY_ID eid = static_cast<const KBEngine::EventData_LeaveWorld*>(lpEventData)->entityID;
+
+		bool bPlayer = false;
+		if (kbengine_PlayerID() == eid)
+		{
+			bPlayer = true;
+			setPlayerEntity(NULL);
+		}
+
+		if (getTargetEntity() && getTargetEntity()->id() == eid)
+			setTargetEntity(NULL);
+
+		if (getMouseTarget() && getMouseTarget()->id() == eid)
+			setMouseTarget(NULL);
+
+		eraseEntity(eid);
+
+		sprintf(str, "KBE Event received ==> CLIENT_EVENT_LEAVEWORLD - %s - EntityID %d\n", bPlayer ? "PLAYER" : "OTHER", (int)eid);
+		kbengine_PrintMessage(str);
+	}
+	break;
+
+	case CLIENT_EVENT_ENTERSPACE:
+	{
+		const KBEngine::EventData_EnterSpace* pEventData_EnterSpace = static_cast<const KBEngine::EventData_EnterSpace*>(lpEventData);
+		KBEngine::ENTITY_ID eid = pEventData_EnterSpace->entityID;
+
+		bool bPlayer = false;
+		KBEntity* pEntity = getEntity(eid, bPlayer);
+		if (pEntity == NULL)
+		{
+			bool bPlayer = false;
+			if (kbengine_PlayerID() == eid)
+				bPlayer = true;
+			sprintf(str, "KBE Event received ==> CLIENT_EVENT_ENTERSPACE - %s - EntityID: %d (NOT IN LIST), SpaceID: %d, Yaw/Pitch/Roll: %f/%f/%f, X/Y/Z: %f/%f/%f, Speed: %f, IsOnGround: %d, Res: %s\n", bPlayer ? "PLAYER" : "OTHER",
+				(int)pEventData_EnterSpace->entityID, (int)pEventData_EnterSpace->spaceID,
+				pEventData_EnterSpace->yaw, pEventData_EnterSpace->pitch, pEventData_EnterSpace->roll,
+				pEventData_EnterSpace->x, pEventData_EnterSpace->y, pEventData_EnterSpace->z,
+				pEventData_EnterSpace->speed, pEventData_EnterSpace->isOnGround, pEventData_EnterSpace->res.c_str());
+			kbengine_PrintMessage(str, true);
+			break;
+		}
+
+		pEntity->setPosition(pEventData_EnterSpace->x, pEventData_EnterSpace->y, pEventData_EnterSpace->z);
+		if (bPlayer)
+			pEntity->setDesideredPosition(pEventData_EnterSpace->x, pEventData_EnterSpace->y, pEventData_EnterSpace->z);
+		pEntity->setDirection(pEventData_EnterSpace->yaw, pEventData_EnterSpace->pitch, pEventData_EnterSpace->roll);
+		if (bPlayer)
+			pEntity->setDesideredDirection(pEventData_EnterSpace->yaw, pEventData_EnterSpace->pitch, pEventData_EnterSpace->roll);
+		pEntity->setMoveSpeed(pEventData_EnterSpace->speed);
+		pEntity->setSpaceID(pEventData_EnterSpace->spaceID);
+		pEntity->setIsOnGround(pEventData_EnterSpace->isOnGround);
+		pEntity->setRes(pEventData_EnterSpace->res);
+
+		pEntity->setIsInWorld(true);
+
+		sprintf(str, "KBE Event received ==> CLIENT_EVENT_ENTERSPACE - %s - EntityID: %d, SpaceID: %d, Yaw/Pitch/Roll: %f/%f/%f, X/Y/Z: %f/%f/%f, Speed: %f, IsOnGround: %d, Res: %s\n", bPlayer ? "PLAYER" : "OTHER",
+			(int)pEventData_EnterSpace->entityID, (int)pEventData_EnterSpace->spaceID,
+			pEventData_EnterSpace->yaw, pEventData_EnterSpace->pitch, pEventData_EnterSpace->roll,
+			pEventData_EnterSpace->x, pEventData_EnterSpace->y, pEventData_EnterSpace->z,
+			pEventData_EnterSpace->speed, pEventData_EnterSpace->isOnGround, pEventData_EnterSpace->res.c_str());
+		kbengine_PrintMessage(str, true);
+
+		if (bPlayer)
+		{
+			setAppMode(TheWorld_ClientApp::WorldMode);
+			playerEnterSpace(pEventData_EnterSpace->spaceID);
+		}
+	}
+	break;
+
+	case CLIENT_EVENT_LEAVESPACE:
+	{
+		KBEngine::ENTITY_ID eid = static_cast<const KBEngine::EventData_LeaveSpace*>(lpEventData)->entityID;
+		KBEngine::SPACE_ID spaceId = static_cast<const KBEngine::EventData_LeaveSpace*>(lpEventData)->spaceID;
+
+		bool bPlayer = false;
+		if (kbengine_PlayerID() == eid)
+		{
+			bPlayer = true;
+			//m_pPlayer = NULL;
+		}
+
+		if (getTargetEntity() && getTargetEntity()->id() == eid)
+			setTargetEntity(NULL);
+
+		if (getMouseTarget() && getMouseTarget()->id() == eid)
+			setMouseTarget(NULL);
+
+		eraseEntity(eid);
+
+		sprintf(str, "KBE Event received ==> CLIENT_EVENT_LEAVESPACE - %s - EntityID %d, SpaceID: %d\n", bPlayer ? "PLAYER" : "OTHER", (int)eid, (int)spaceId);
+		kbengine_PrintMessage(str);
+
+		if (bPlayer)
+		{
+			playerLeaveSpace(spaceId);
+		}
+	}
+	break;
+
+	case CLIENT_EVENT_CREATEDENTITY:
+	{
+		const KBEngine::EventData_CreatedEntity* pEventData_createEntity = static_cast<const KBEngine::EventData_CreatedEntity*>(lpEventData);
+		KBEngine::ENTITY_ID eid = pEventData_createEntity->entityID;
+
+		bool bPlayer = false;
+		KBEntity* pEntity = createEntity(eid, bPlayer);
+
+		pEntity->setModelScale(pEventData_createEntity->modelScale);
+
+		sprintf(str, "KBE Event received ==> CLIENT_EVENT_CREATEDENTITY - %s - EntityID: %d, ModelScale: %f\n", bPlayer ? "PLAYER" : "OTHER", (int)pEventData_createEntity->entityID, (float)pEventData_createEntity->modelScale);
+		kbengine_PrintMessage(str);
+	}
+	break;
+
+	case CLIENT_EVENT_LOGIN_SUCCESS:
+	{
+		setLoginStatus(LOGIN_DONE);
+		strcpy(str, "KBE Event received ==> CLIENT_EVENT_LOGIN_SUCCESS\n");
+		kbengine_PrintMessage(str);
+	}
+	break;
+
+	case CLIENT_EVENT_LOGIN_FAILED:
+	{
+		setLoginStatus(LOGIN_NOT_DONE);
+		const KBEngine::EventData_LoginFailed* info = static_cast<const KBEngine::EventData_LoginFailed*>(lpEventData);
+
+		if (info->failedcode == 20)
+		{
+			sprintf(str, "KBE Event received ==> CLIENT_EVENT_LOGIN_FAILED - Server is starting, please wait!\n");
+		}
+		else
+		{
+			sprintf(str, "KBE Event received ==> CLIENT_EVENT_LOGIN_FAILED - Login is failed (code=%u)!\n", info->failedcode);
+		}
+
+		kbengine_PrintMessage(str);
+	}
+	break;
+
+	case CLIENT_EVENT_LOGIN_BASEAPP_SUCCESS:
+	{
+		strcpy(str, "KBE Event received ==> CLIENT_EVENT_LOGIN_BASEAPP_SUCCESS\n");
+		kbengine_PrintMessage(str);
+	}
+	break;
+
+	case CLIENT_EVENT_LOGIN_BASEAPP_FAILED:
+	{
+		const KBEngine::EventData_LoginBaseappFailed* info = static_cast<const KBEngine::EventData_LoginBaseappFailed*>(lpEventData);
+		sprintf(str, "KBE Event received ==> CLIENT_EVENT_LOGIN_BASEAPP_FAILED (code=%u)!\n", info->failedcode);
+		kbengine_PrintMessage(str);
+	}
+	break;
+
+	case CLIENT_EVENT_SCRIPT:
+	{
+		const KBEngine::EventData_Script* peventdata = static_cast<const KBEngine::EventData_Script*>(lpEventData);
+
+		Json::Reader reader;
+		Json::Value root;
+
+		if (!reader.parse(peventdata->datas.c_str(), root))
+		{
+			assert(false);
+		}
+
+		if (peventdata->name == "update_avatars")
+		{
+			strcpy(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT, peventdata->name: ");
+			strcat(str, peventdata->name.c_str());
+			strcat(str, "\n");
+			kbengine_PrintMessage(str);
+
+			setInitAppModeRequired(true);
+
+			clearAvatars();
+
+			Json::Value::Members mem = root.getMemberNames();
+			for (auto iter = mem.begin(); iter != mem.end(); iter++)
+			{
+				Json::Value& val = root[*iter];
+				std::string name = val[1].asString();
+				KBEngine::DBID avatarDBID = val[Json::Value::UInt(0)].asUInt();
+				KBAvatar* pAvatar = new KBAvatar(avatarDBID, name);
+				AVATARS& avatars = getAvatars();
+				avatars[avatarDBID].reset(pAvatar);
+				sprintf(str, "\t\tAvatar DBID: [%ld] , Avatar Name: [%s]\n", (long)avatarDBID, name.c_str());
+				kbengine_PrintMessage(str, true);
+			}
+		}
+		else
+		{
+			KBEngine::ENTITY_ID eid = root[Json::Value::UInt(0)].asInt();
+
+			bool bPlayer = false;
+			KBEntity* pEntity = getEntity(eid, bPlayer);;
+
+			if (peventdata->name == "set_name")
+			{
+				if (pEntity == NULL)
+				{
+					sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT (ENTITY NOT FOUND), EntityID: %d, peventdata->name: %s\n", (int)eid, peventdata->name.c_str());
+					kbengine_PrintMessage(str);
+					break;
+				}
+
+				std::string name = root[1].asString();
+				pEntity->setName(name);
+
+				sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT, EntityID: %d, peventdata->name: %s, name: %s\n", (int)eid, peventdata->name.c_str(), name.c_str());
+				kbengine_PrintMessage(str);
+			}
+			else if (peventdata->name == "set_class_name")
+			{
+				if (pEntity == NULL)
+				{
+					sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT (ENTITY NOT FOUND), EntityID: %d, peventdata->name: %s\n", (int)eid, peventdata->name.c_str());
+					kbengine_PrintMessage(str);
+					break;
+				}
+
+				std::string className = root[1].asString();
+				pEntity->setClassName(className);
+
+				sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT, EntityID: %d, peventdata->name: %s, name: %s\n", (int)eid, peventdata->name.c_str(), className.c_str());
+				kbengine_PrintMessage(str);
+			}
+			else if (peventdata->name == "set_modelScale")
+			{
+				if (pEntity == NULL)
+				{
+					sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT (ENTITY NOT FOUND), EntityID: %d, peventdata->name: %s\n", (int)eid, peventdata->name.c_str());
+					kbengine_PrintMessage(str);
+					break;
+				}
+
+				uint32_t scale = root[1].asUInt();
+				pEntity->setModelScale(scale / (float)100.0);
+
+				sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT, EntityID: %d, peventdata->name: %s, modelScale: %d\n", (int)eid, peventdata->name.c_str(), (int)scale);
+				kbengine_PrintMessage(str);
+			}
+			else if (peventdata->name == "set_modelID")
+			{
+				if (pEntity == NULL)
+				{
+					sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT (ENTITY NOT FOUND), EntityID: %d, peventdata->name: %s\n", (int)eid, peventdata->name.c_str());
+					kbengine_PrintMessage(str);
+					break;
+				}
+
+				uint32_t modelID = root[1].asUInt();
+				pEntity->setModelID(modelID);
+
+				sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT, EntityID: %d, peventdata->name: %s, modelID: %d\n", (int)eid, peventdata->name.c_str(), (int)modelID);
+				kbengine_PrintMessage(str);
+			}
+			else if (peventdata->name == "set_state")
+			{
+				if (pEntity == NULL)
+				{
+					sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT (ENTITY NOT FOUND), EntityID: %d, peventdata->name: %s\n", (int)eid, peventdata->name.c_str());
+					kbengine_PrintMessage(str);
+					break;
+				}
+
+				int32_t state = root[1].asInt();
+				pEntity->setState(state);
+
+				sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT, EntityID: %d, peventdata->name: %s, state: %d\n", (int)eid, peventdata->name.c_str(), (int)state);
+				kbengine_PrintMessage(str);
+			}
+			else if (peventdata->name == "set_HP_Max")
+			{
+				if (pEntity == NULL)
+				{
+					sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT (ENTITY NOT FOUND), EntityID: %d, peventdata->name: %s\n", (int)eid, peventdata->name.c_str());
+					kbengine_PrintMessage(str);
+					break;
+				}
+
+				int32_t v = root[1].asInt();
+				pEntity->setHPMax(v);
+
+				sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT, EntityID: %d, peventdata->name: %s, HPMax: %d\n", (int)eid, peventdata->name.c_str(), (int)v);
+				kbengine_PrintMessage(str);
+			}
+			else if (peventdata->name == "set_MP_Max")
+			{
+				if (pEntity == NULL)
+				{
+					sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT (ENTITY NOT FOUND), EntityID: %d, peventdata->name: %s\n", (int)eid, peventdata->name.c_str());
+					kbengine_PrintMessage(str);
+					break;
+				}
+
+				int32_t v = root[1].asInt();
+				pEntity->setMPMax(v);
+
+				sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT, EntityID: %d, peventdata->name: %s, MPMax: %d\n", (int)eid, peventdata->name.c_str(), (int)v);
+				kbengine_PrintMessage(str);
+			}
+			else if (peventdata->name == "recvDamage")
+			{
+				KBEngine::ENTITY_ID attackerID = root[1].asInt();
+				uint32_t skillID = root[2].asUInt();
+				uint32_t damageType = root[3].asUInt();
+				uint32_t damage = root[4].asUInt();
+
+				bool bPlayer = false;
+				KBEntity* attacker = getEntity(attackerID, bPlayer);
+				KBEntity* receiver = pEntity;
+				KBEngine::ENTITY_ID eidAttacker = 0;
+
+				if (attacker)
+				{
+					attacker->attack(receiver, skillID, damageType, damage);
+				}
+
+				if (receiver)
+				{
+					receiver->recvDamage(attacker, skillID, damageType, damage);
+				}
+
+				sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT, EntityID: %d, peventdata->name: %s, EID Attacker: %d, skillId: %d, damageType: %d, damage: %d\n", (int)eid, peventdata->name.c_str(), (int)eidAttacker, (int)skillID, (int)damageType, (int)damage);
+				kbengine_PrintMessage(str);
+			}
+		}
+		// TODO
+	}
+	break;
+
+	case CLIENT_EVENT_POSITION_CHANGED:
+	{
+		const KBEngine::EventData_PositionChanged* pEventData = static_cast<const KBEngine::EventData_PositionChanged*>(lpEventData);
+		KBEngine::ENTITY_ID eid = pEventData->entityID;
+
+		bool bPlayer = false;
+		KBEntity* pEntity = getEntity(eid, bPlayer);
+		if (!pEntity)
+		{
+			sprintf(str, "KBE Event received ==> CLIENT_EVENT_POSITION_CHANGED - %s - EntityID %d (NOT IN LIST), X/Y/Z: %f/%f/%f\n", bPlayer ? "PLAYER" : "OTHER", (int)eid, pEventData->x, pEventData->y, pEventData->z);
+			kbengine_PrintMessage(str);
+			break;
+		}
+
+		pEntity->setPosition(pEventData->x, pEventData->y, pEventData->z);
+		if (bPlayer)
+			pEntity->setDesideredPosition(pEventData->x, pEventData->y, pEventData->z);
+
+		sprintf(str, "KBE Event received ==> CLIENT_EVENT_POSITION_CHANGED - %s - EntityID %d, X/Y/Z: %f/%f/%f\n", bPlayer ? "PLAYER" : "OTHER", (int)eid, pEventData->x, pEventData->y, pEventData->z);
+		kbengine_PrintMessage(str);
+	}
+	break;
+
+	case CLIENT_EVENT_DIRECTION_CHANGED:
+	{
+		const KBEngine::EventData_DirectionChanged* pEventData = static_cast<const KBEngine::EventData_DirectionChanged*>(lpEventData);
+		KBEngine::ENTITY_ID eid = pEventData->entityID;
+
+		bool bPlayer = false;
+		KBEntity* pEntity = getEntity(eid, bPlayer);
+		if (!pEntity)
+		{
+			sprintf(str, "KBE Event received ==> CLIENT_EVENT_DIRECTION_CHANGED - %s - EntityID %d (NOT IN LIST), Yaw/Pitch/Roll: %f/%f/%f\n", bPlayer ? "PLAYER" : "OTHER", (int)eid, pEventData->yaw, pEventData->pitch, pEventData->roll);
+			kbengine_PrintMessage(str);
+			break;
+		}
+
+		pEntity->setDirection(pEventData->yaw, pEventData->pitch, pEventData->roll);
+		if (bPlayer)
+			pEntity->setDesideredDirection(pEventData->yaw, pEventData->pitch, pEventData->roll);
+
+		sprintf(str, "KBE Event received ==> CLIENT_EVENT_DIRECTION_CHANGED - %s - EntityID %d, Yaw/Pitch/Roll: %f/%f/%f\n", bPlayer ? "PLAYER" : "OTHER", (int)eid, pEventData->yaw, pEventData->pitch, pEventData->roll);
+		kbengine_PrintMessage(str);
+	}
+	break;
+
+	case CLIENT_EVENT_MOVESPEED_CHANGED:
+	{
+		const KBEngine::EventData_MoveSpeedChanged* pEventData = static_cast<const KBEngine::EventData_MoveSpeedChanged*>(lpEventData);
+		KBEngine::ENTITY_ID eid = pEventData->entityID;
+
+		bool bPlayer = false;
+		KBEntity* pEntity = getEntity(eid, bPlayer);
+		if (!pEntity)
+		{
+			sprintf(str, "KBE Event received ==> CLIENT_EVENT_MOVESPEED_CHANGED - %s - EntityID %d (NOT IN LIST), MoveSpeed %f\n", bPlayer ? "PLAYER" : "OTHER", (int)eid, pEventData->speed);
+			kbengine_PrintMessage(str);
+			break;
+		}
+
+		pEntity->setMoveSpeed(pEventData->speed);
+
+		sprintf(str, "KBE Event received ==> CLIENT_EVENT_MOVESPEED_CHANGED - %s - EntityID %d, MoveSpeed %f\n", bPlayer ? "PLAYER" : "OTHER", (int)eid, pEventData->speed);
+		kbengine_PrintMessage(str);
+	}
+	break;
+
+	case CLIENT_EVENT_SERVER_CLOSED:
+	{
+		//m_bServerClosed = true;
+		setShutdownRequired(true);
+		setLoginStatus(LOGIN_NOT_DONE);
+		setInitAppModeRequired(false);
+		strcpy(str, "KBE Event received ==> CLIENT_EVENT_SERVER_CLOSED\n");
+		kbengine_PrintMessage(str);
+	}
+	break;
+
+	case CLIENT_EVENT_POSITION_FORCE:
+	{
+		const KBEngine::EventData_PositionForce* pEventData = static_cast<const KBEngine::EventData_PositionForce*>(lpEventData);
+		KBEngine::ENTITY_ID eid = pEventData->entityID;
+
+		bool bPlayer = false;
+		KBEntity* pEntity = getEntity(eid, bPlayer);
+		if (!pEntity)
+		{
+			sprintf(str, "KBE Event received ==> CLIENT_EVENT_POSITION_FORCE - %s - EntityID %d (NOT IN LIST), X/Y/Z: %f/%f/%f\n", bPlayer ? "PLAYER" : "OTHER", (int)eid, pEventData->x, pEventData->y, pEventData->z);
+			kbengine_PrintMessage(str);
+			break;
+		}
+
+		pEntity->setPosition(pEventData->x, pEventData->y, pEventData->z);
+		if (bPlayer)
+			pEntity->setDesideredPosition(pEventData->x, pEventData->y, pEventData->z);
+
+		sprintf(str, "KBE Event received ==> CLIENT_EVENT_POSITION_FORCE - %s - EntityID %d, X/Y/Z: %f/%f/%f\n", bPlayer ? "PLAYER" : "OTHER", (int)eid, pEventData->x, pEventData->y, pEventData->z);
+		kbengine_PrintMessage(str);
+	}
+	break;
+
+	case CLIENT_EVENT_DIRECTION_FORCE:
+	{
+		const KBEngine::EventData_DirectionForce* pEventData = static_cast<const KBEngine::EventData_DirectionForce*>(lpEventData);
+		KBEngine::ENTITY_ID eid = pEventData->entityID;
+
+		bool bPlayer = false;
+		KBEntity* pEntity = getEntity(eid, bPlayer);
+		if (!pEntity)
+		{
+			sprintf(str, "KBE Event received ==> CLIENT_EVENT_DIRECTION_FORCE - %s - EntityID %d (NOT IN LIST), Yaw/Pitch/Roll: %f/%f/%f\n", bPlayer ? "PLAYER" : "OTHER", (int)eid, pEventData->yaw, pEventData->pitch, pEventData->roll);
+			kbengine_PrintMessage(str);
+			break;
+		}
+
+		pEntity->setDirection(pEventData->yaw, pEventData->pitch, pEventData->roll);
+		if (bPlayer)
+			pEntity->setDesideredDirection(pEventData->yaw, pEventData->pitch, pEventData->roll);
+
+		sprintf(str, "KBE Event received ==> CLIENT_EVENT_DIRECTION_FORCE - %s - EntityID %d, Yaw/Pitch/Roll: %f/%f/%f\n", bPlayer ? "PLAYER" : "OTHER", (int)eid, pEventData->yaw, pEventData->pitch, pEventData->roll);
+		kbengine_PrintMessage(str);
+	}
+	break;
+
+	case CLIENT_EVENT_ADDSPACEGEOMAPPING:
+	{
+		const KBEngine::EventData_AddSpaceGEOMapping* pEventData = static_cast<const KBEngine::EventData_AddSpaceGEOMapping*>(lpEventData);
+		KBEngine::SPACE_ID spaceID = pEventData->spaceID;
+		getSpaceWorld()->addSpace(spaceID, pEventData->respath);
+		sprintf(str, "KBE Event received ==> CLIENT_EVENT_ADDSPACEGEOMAPPING, SpaceID %d, ResPath %s\n", (int)spaceID, pEventData->respath.c_str());
+		kbengine_PrintMessage(str, true);
+	}
+	break;
+
+	case CLIENT_EVENT_VERSION_NOT_MATCH:
+	{
+		const KBEngine::EventData_VersionNotMatch* info = static_cast<const KBEngine::EventData_VersionNotMatch*>(lpEventData);
+		sprintf(str, "KBE Event received ==> CLIENT_EVENT_VERSION_NOT_MATCH - VerInfo=%s not match(server:%s)\n", info->verInfo.c_str(), info->serVerInfo.c_str());
+		kbengine_PrintMessage(str);
+	}
+	break;
+
+	case CLIENT_EVENT_ON_KICKED:
+	{
+		const KBEngine::EventData_onKicked* info = static_cast<const KBEngine::EventData_onKicked*>(lpEventData);
+		sprintf(str, "KBE Event received ==> CLIENT_EVENT_ON_KICKED (code=%u)!\n", info->failedcode);
+		kbengine_PrintMessage(str);
+	}
+	break;
+
+	case CLIENT_EVENT_LAST_ACCOUNT_INFO:
+	{
+		const KBEngine::EventData_LastAccountInfo* info = static_cast<const KBEngine::EventData_LastAccountInfo*>(lpEventData);
+		setAccountName(info->name);
+
+		sprintf(str, "KBE Event received ==> CLIENT_EVENT_LAST_ACCOUNT_INFO - Last account name: %s\n", info->name.c_str());
+		kbengine_PrintMessage(str);
+	}
+	break;
+
+	case CLIENT_EVENT_SCRIPT_VERSION_NOT_MATCH:
+	{
+		const KBEngine::EventData_ScriptVersionNotMatch* info = static_cast<const KBEngine::EventData_ScriptVersionNotMatch*>(lpEventData);
+		sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT_VERSION_NOT_MATCH - ScriptVerInfo=%s not match(server:%s)\n", info->verInfo.c_str(), info->serVerInfo.c_str());
+		kbengine_PrintMessage(str);
+	}
+	break;
+
+	case CLIENT_EVENT_UNKNOWN:
+	default:
+	{
+		//kbe_fireEvent("reset", NULL);
+		//kbe_fireEvent("relive", NULL);
+		strcpy(str, "KBE Event received ==> CLIENT_EVENT_UNKNOWN\n");
+		kbengine_PrintMessage(str);
+	}
+	break;
+	};
 }

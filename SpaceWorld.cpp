@@ -24,6 +24,7 @@ void Space::dumpStatus(int idx, bool minidump)
 
 SpaceWorld::SpaceWorld()
 {
+	m_playerSpaceId = -1;
 }
 
 
@@ -49,6 +50,12 @@ void SpaceWorld::addSpace(KBEngine::SPACE_ID spaceID, const std::string& resPath
 
 Space* SpaceWorld::findSpace(KBEngine::SPACE_ID spaceID)
 {
+	if (spaceID == -1)
+		spaceID = m_playerSpaceId;
+	
+	if (spaceID == -1)
+		return NULL;
+
 	SPACES::iterator iter = m_Spaces.find(spaceID);
 	if (iter == m_Spaces.end())
 	{

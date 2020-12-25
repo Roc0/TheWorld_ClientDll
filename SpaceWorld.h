@@ -22,11 +22,15 @@ class __declspec(dllexport) SpaceWorld
 public:
 	SpaceWorld();
 	virtual ~SpaceWorld();
+
+	void setPlayerSpaceId(KBEngine::SPACE_ID playerSpaceId) { m_playerSpaceId = playerSpaceId; };
+	KBEngine::SPACE_ID getPlayerSpaceId(void) { return m_playerSpaceId; };
 	void addSpace(KBEngine::SPACE_ID spaceID, const std::string& resPath);
-	Space* findSpace(KBEngine::SPACE_ID spaceID);
+	Space* findSpace(KBEngine::SPACE_ID spaceID = -1);
 	void dumpStatus(bool minidump);
 
 protected:
+	KBEngine::SPACE_ID m_playerSpaceId;
 	SPACES m_Spaces;
 };
 
