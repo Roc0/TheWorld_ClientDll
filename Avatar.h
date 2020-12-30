@@ -1,20 +1,21 @@
 #pragma once
 
-#include "TheWorld_ClientDll.h"
+//#include "TheWorld_ClientDll.h"
+#include <string>
 
-class __declspec(dllexport) KBAvatar
+class KBAvatar
 {
 public:
-	KBAvatar(KBEngine::DBID avatarDBID, const std::string& avatarName);
+	KBAvatar(__int64 avatarDBID, const char* avatarName);
 	~KBAvatar();
 
-	KBEngine::DBID getAvatarID(void) { return m_avatarDBID; }
-	const std::string& getAvatarName(void) { return m_avatarName; }
+	__int64 getAvatarID(void) { return m_avatarDBID; }
+	const char* getAvatarName(void) { return m_avatarName.c_str(); }
 	
-	void dumpStatus(int idx, bool minidump);
+	__declspec(dllexport) void dumpStatus(int idx, bool minidump);
 
 protected:
-	KBEngine::DBID m_avatarDBID;
+	__int64 m_avatarDBID;
 	std::string m_avatarName;
 };
 

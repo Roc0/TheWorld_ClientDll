@@ -2,7 +2,7 @@
 #include "Avatar.h"
 
 
-KBAvatar::KBAvatar(KBEngine::DBID avatarDBID, const std::string & avatarName)
+KBAvatar::KBAvatar(__int64 avatarDBID, const char* avatarName)
 {
 	m_avatarDBID = avatarDBID;
 	m_avatarName = avatarName;

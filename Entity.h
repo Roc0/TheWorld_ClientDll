@@ -1,7 +1,7 @@
 #pragma once
 #include "SpaceWorld.h"
 
-#include "TheWorld_ClientDll.h"
+//#include "TheWorld_ClientDll.h"
 
 class _Vector3
 {
@@ -11,10 +11,10 @@ public:
 	float z;
 };
 
-class __declspec(dllexport) KBEntity
+class KBEntity
 {
 protected:
-	KBEntity(KBEngine::ENTITY_ID eid, SpaceWorld* pSpaceWorld);
+	KBEntity(int eid, SpaceWorld* pSpaceWorld);
 public:
 	virtual ~KBEntity();
 
@@ -96,7 +96,7 @@ public:
 		return m_moveSpeed;
 	}
 
-	void setSpaceID(KBEngine::SPACE_ID spaceID)
+	void setSpaceID(int spaceID)
 	{
 		m_spaceId = spaceID;
 	}
@@ -106,12 +106,9 @@ public:
 		m_bIsOnGround = isOnGround;
 	}
 
-	bool getIsOnGround(void)
-	{
-		return kbe_isOnGround(m_eid);
-	}
+	__declspec(dllexport) bool getIsOnGround(void);
 
-	void setRes(const std::string & res)
+	void setRes(const char* res)
 	{
 		m_res = res;
 	}
@@ -121,14 +118,14 @@ public:
 		m_modelScale = modelScale;
 	}
 
-	void setName(const std::string& name)
+	void setName(const char* name)
 	{
 		m_name = name;
 	}
 	
-	std::string getName(void)
+	const char* getName(void)
 	{
-		return m_name;
+		return m_name.c_str();
 	}
 
 	void setClassName(const std::string& name)
@@ -136,9 +133,9 @@ public:
 		m_className = name;
 	}
 	
-	std::string getClassName(void)
+	const char* getClassName(void)
 	{
-		return m_className;
+		return m_className.c_str();
 	}
 
 	void setIsInWorld(bool isInWorld)
@@ -171,18 +168,18 @@ public:
 		m_MPMax = MPMax;
 	}
 
-	KBEngine::ENTITY_ID id()const { return m_eid; }
+	int id()const { return m_eid; }
 
 	bool isPlayer() { return m_bIsPlayer;  }
 
 	void attack(KBEntity* receiver, uint32_t skillID, uint32_t damageType, uint32_t damage);
 	void recvDamage(KBEntity* attacker, uint32_t skillID, uint32_t damageType, uint32_t damage);
 
-	void dumpStatus(int idx, bool minidump);
+	__declspec(dllexport) void dumpStatus(int idx, bool minidump);
 
 protected:
-	KBEngine::ENTITY_ID m_eid;				// entityID
-	KBEngine::SPACE_ID m_spaceId;
+	int m_eid;				// entityID
+	int m_spaceId;
 	float m_moveSpeed;
 	_Vector3 m_destPos, m_pos, m_destDir, m_dir;
 	bool m_bIsOnGround;

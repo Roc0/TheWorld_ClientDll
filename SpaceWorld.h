@@ -1,36 +1,39 @@
 #pragma once
 
-#include "TheWorld_ClientDll.h"
+//#include "TheWorld_ClientDll.h"
+#include <string>
+#include <map>
+#include <memory>
 
-class __declspec(dllexport) Space {
+class Space {
 public:
-	Space(KBEngine::SPACE_ID spaceID, const std::string& resPath);
+	__declspec(dllexport) Space(int spaceID, const char *resPath);
 	void dumpStatus(int idx, bool minidump);
-	std::string getResPath() { return m_resPath; }
+	const char * getResPath() { return m_resPath.c_str(); }
 
-protected:
-	KBEngine::SPACE_ID m_spaceID;
+private:
+	int m_spaceID;
 	std::string m_resPath;
 };
 
 
-typedef std::map<KBEngine::SPACE_ID, std::tr1::shared_ptr<Space> > SPACES;
+typedef std::map<int, std::shared_ptr<Space> > SPACES;
 
 
-class __declspec(dllexport) SpaceWorld
+class SpaceWorld
 {
 public:
-	SpaceWorld();
+	__declspec(dllexport) SpaceWorld();
 	virtual ~SpaceWorld();
 
-	void setPlayerSpaceId(KBEngine::SPACE_ID playerSpaceId) { m_playerSpaceId = playerSpaceId; };
-	KBEngine::SPACE_ID getPlayerSpaceId(void) { return m_playerSpaceId; };
-	void addSpace(KBEngine::SPACE_ID spaceID, const std::string& resPath);
-	Space* findSpace(KBEngine::SPACE_ID spaceID = -1);
-	void dumpStatus(bool minidump);
+	void setPlayerSpaceId(int playerSpaceId) { m_playerSpaceId = playerSpaceId; };
+	int getPlayerSpaceId(void) { return m_playerSpaceId; };
+	void addSpace(int spaceID, const char* resPath);
+	__declspec(dllexport) Space* findSpace(int spaceID = -1);
+	__declspec(dllexport) void dumpStatus(bool minidump);
 
-protected:
-	KBEngine::SPACE_ID m_playerSpaceId;
+private:
+	int m_playerSpaceId;
 	SPACES m_Spaces;
 };
 

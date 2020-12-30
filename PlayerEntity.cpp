@@ -2,7 +2,7 @@
 #include "PlayerEntity.h"
 
 
-PlayerEntity::PlayerEntity(KBEngine::ENTITY_ID eid, SpaceWorld *pSpaceWorld) : KBEntity(eid, pSpaceWorld)
+PlayerEntity::PlayerEntity(int eid, SpaceWorld *pSpaceWorld) : KBEntity(eid, pSpaceWorld)
 {
 	m_bIsInWorld = false;
 	m_bIsPlayer = true;

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "SpaceWorld.h"
 
-Space::Space(KBEngine::SPACE_ID spaceID, const std::string& resPath)
+Space::Space(int spaceID, const char *resPath)
 {
 	m_spaceID = spaceID;
 	m_resPath = resPath;
@@ -32,7 +32,7 @@ SpaceWorld::~SpaceWorld()
 {
 }
 
-void SpaceWorld::addSpace(KBEngine::SPACE_ID spaceID, const std::string& resPath)
+void SpaceWorld::addSpace(int spaceID, const char *resPath)
 {
 	char str[256];
 	SPACES::iterator iter = m_Spaces.find(spaceID);
@@ -43,12 +43,12 @@ void SpaceWorld::addSpace(KBEngine::SPACE_ID spaceID, const std::string& resPath
 	}
 	else
 	{
-		sprintf(str, "Duplicate Space - SpaceID %d", (int)spaceID);
+		sprintf_s(str, "Duplicate Space - SpaceID %d", (int)spaceID);
 		printf(str);	printf("\n");
 	}
 }
 
-Space* SpaceWorld::findSpace(KBEngine::SPACE_ID spaceID)
+Space* SpaceWorld::findSpace(int spaceID)
 {
 	if (spaceID == -1)
 		spaceID = m_playerSpaceId;

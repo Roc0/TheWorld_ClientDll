@@ -14,8 +14,8 @@
 #include <string>
 #include <queue>
 
-typedef std::map<KBEngine::ENTITY_ID, std::tr1::shared_ptr<KBEntity> > ENTITIES;
-typedef std::map<KBEngine::DBID, std::tr1::shared_ptr<KBAvatar> > AVATARS;
+typedef std::map<int, std::shared_ptr<KBEntity> > ENTITIES;
+typedef std::map<__int64, std::shared_ptr<KBAvatar> > AVATARS;
 
 class __declspec(dllexport) TheWorld_ClientApp : public KBEngine::EventHandle
 {

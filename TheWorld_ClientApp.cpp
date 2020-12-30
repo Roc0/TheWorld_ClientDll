@@ -289,7 +289,7 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 		pEntity->setMoveSpeed(pEventData_EnterWorld->speed);
 		pEntity->setSpaceID(pEventData_EnterWorld->spaceID);
 		pEntity->setIsOnGround(pEventData_EnterWorld->isOnGround);
-		pEntity->setRes(pEventData_EnterWorld->res);
+		pEntity->setRes(pEventData_EnterWorld->res.c_str());
 
 		pEntity->setIsInWorld(true);
 
@@ -359,7 +359,7 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 		pEntity->setMoveSpeed(pEventData_EnterSpace->speed);
 		pEntity->setSpaceID(pEventData_EnterSpace->spaceID);
 		pEntity->setIsOnGround(pEventData_EnterSpace->isOnGround);
-		pEntity->setRes(pEventData_EnterSpace->res);
+		pEntity->setRes(pEventData_EnterSpace->res.c_str());
 
 		pEntity->setIsInWorld(true);
 
@@ -493,7 +493,7 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 				Json::Value& val = root[*iter];
 				std::string name = val[1].asString();
 				KBEngine::DBID avatarDBID = val[Json::Value::UInt(0)].asUInt();
-				KBAvatar* pAvatar = new KBAvatar(avatarDBID, name);
+				KBAvatar* pAvatar = new KBAvatar(avatarDBID, name.c_str());
 				AVATARS& avatars = getAvatars();
 				avatars[avatarDBID].reset(pAvatar);
 				sprintf(str, "\t\tAvatar DBID: [%ld] , Avatar Name: [%s]\n", (long)avatarDBID, name.c_str());
@@ -517,7 +517,7 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 				}
 
 				std::string name = root[1].asString();
-				pEntity->setName(name);
+				pEntity->setName(name.c_str());
 
 				sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT, EntityID: %d, peventdata->name: %s, name: %s\n", (int)eid, peventdata->name.c_str(), name.c_str());
 				kbengine_PrintMessage(str);
@@ -770,7 +770,7 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 	{
 		const KBEngine::EventData_AddSpaceGEOMapping* pEventData = static_cast<const KBEngine::EventData_AddSpaceGEOMapping*>(lpEventData);
 		KBEngine::SPACE_ID spaceID = pEventData->spaceID;
-		getSpaceWorld()->addSpace(spaceID, pEventData->respath);
+		getSpaceWorld()->addSpace(spaceID, pEventData->respath.c_str());
 		sprintf(str, "KBE Event received ==> CLIENT_EVENT_ADDSPACEGEOMAPPING, SpaceID %d, ResPath %s\n", (int)spaceID, pEventData->respath.c_str());
 		kbengine_PrintMessage(str, true);
 	}

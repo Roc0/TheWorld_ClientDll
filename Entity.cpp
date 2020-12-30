@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "Entity.h"
 
-KBEntity::KBEntity(KBEngine::ENTITY_ID eid, SpaceWorld *spaceWorld)
+#include "TheWorld_ClientDll.h"
+
+KBEntity::KBEntity(int eid, SpaceWorld *spaceWorld)
 {
 	m_eid = eid;
 	m_pSpaceWorld = spaceWorld;
@@ -41,3 +43,9 @@ void KBEntity::dumpStatus(int idx, bool minidump)
 		printf("*** ( Entity %s %d) ******************************************************\n\n", (isPlayer() ? "PLAYER" : "OTHER"), idx);
 	}
 }
+
+bool KBEntity::getIsOnGround(void)
+{
+	return kbe_isOnGround(m_eid);
+}
+

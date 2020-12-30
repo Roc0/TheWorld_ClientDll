@@ -1,9 +1,10 @@
 #pragma once
 #include "Entity.h"
-class __declspec(dllexport) OtherEntity : public KBEntity
+
+class OtherEntity : public KBEntity
 {
 public:
-	OtherEntity(KBEngine::ENTITY_ID eid, SpaceWorld *pSpaceWorld);
+	__declspec(dllexport) OtherEntity(int eid, SpaceWorld *pSpaceWorld);
 	virtual ~OtherEntity();
 };
 
