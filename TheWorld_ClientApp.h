@@ -17,34 +17,37 @@
 typedef std::map<int, std::shared_ptr<KBEntity> > ENTITIES;
 typedef std::map<__int64, std::shared_ptr<KBAvatar> > AVATARS;
 
-class __declspec(dllexport) TheWorld_ClientApp : public KBEngine::EventHandle
+#define CLIENT_APP_EXPORT __declspec(dllexport)
+//#define CLIENT_APP_EXPORT
+
+class TheWorld_ClientApp : public KBEngine::EventHandle
 {
 public:
-	TheWorld_ClientApp(void);
-	~TheWorld_ClientApp(void);
+	CLIENT_APP_EXPORT TheWorld_ClientApp(void);
+	CLIENT_APP_EXPORT ~TheWorld_ClientApp(void);
 
 	// *** KBEngine interaction ***
-	virtual bool kbengine_Init(void);
-	virtual void kbengine_Destroy(void);
-	virtual bool kbengine_Login(const char* accountname, const char* passwd, const char* datas = NULL, KBEngine::uint32 datasize = 0, const char* ip = NULL, KBEngine::uint32 port = 0);
-	virtual bool kbengine_Logout(void);
-	virtual void kbengine_Reset(void);
-	virtual bool kbengine_CreateAvatar(std::string avatarName);
-	virtual bool kbengine_RemoveAvatar(std::string avatarName);
-	virtual bool kbengine_SelectAvatarGame(KBEngine::DBID avatarDBID);
-	virtual void kbengine_onEvent(const KBEngine::EventData* lpEventData);
-	virtual void kbengine_Sleep(UINT32 ui);
-	virtual void kbengine_Shutdown(void);
-	virtual UINT32 kbengine_PlayerID(void);
-	virtual UINT64 kbengine_GenUUID64(void);
-	virtual void kbengine_PrintMessage(char* message, bool interline = false, bool console = true, KBEMessageType t = Print);
-	virtual void kbengine_MessagePump(TheWorld_ClientApp *clientApp);
-	virtual void kbengine_UpdateVolatile(void);
+	CLIENT_APP_EXPORT virtual bool kbengine_Init(void);
+	CLIENT_APP_EXPORT virtual void kbengine_Destroy(void);
+	CLIENT_APP_EXPORT virtual bool kbengine_Login(const char* accountname, const char* passwd, const char* datas = NULL, KBEngine::uint32 datasize = 0, const char* ip = NULL, KBEngine::uint32 port = 0);
+	CLIENT_APP_EXPORT virtual bool kbengine_Logout(void);
+	CLIENT_APP_EXPORT virtual void kbengine_Reset(void);
+	CLIENT_APP_EXPORT virtual bool kbengine_CreateAvatar(std::string avatarName);
+	CLIENT_APP_EXPORT virtual bool kbengine_RemoveAvatar(std::string avatarName);
+	CLIENT_APP_EXPORT virtual bool kbengine_SelectAvatarGame(KBEngine::DBID avatarDBID);
+	CLIENT_APP_EXPORT virtual void kbengine_onEvent(const KBEngine::EventData* lpEventData);
+	CLIENT_APP_EXPORT virtual void kbengine_Sleep(UINT32 ui);
+	CLIENT_APP_EXPORT virtual void kbengine_Shutdown(void);
+	CLIENT_APP_EXPORT virtual UINT32 kbengine_PlayerID(void);
+	CLIENT_APP_EXPORT virtual UINT64 kbengine_GenUUID64(void);
+	CLIENT_APP_EXPORT virtual void kbengine_PrintMessage(char* message, bool interline = false, bool console = true, KBEMessageType t = Print);
+	CLIENT_APP_EXPORT virtual void kbengine_MessagePump(TheWorld_ClientApp *clientApp);
+	CLIENT_APP_EXPORT virtual void kbengine_UpdateVolatile(void);
 	// *** KBEngine interaction ***
 
 	//virtual void setMain(TheWorld_ClientApp* pMain) { m_pMain = pMain; };
 
-	virtual void client_onEvent(const KBEngine::EventData* lpEventData);
+	CLIENT_APP_EXPORT virtual void client_onEvent(const KBEngine::EventData* lpEventData);
 
 	virtual void clearEntities(void) { m_Entities.clear(); };
 	virtual int eraseEntity(KBEngine::ENTITY_ID eid) { return m_Entities.erase(eid); };
