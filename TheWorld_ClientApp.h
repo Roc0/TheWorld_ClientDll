@@ -31,7 +31,7 @@ public:
 	CLIENT_APP_EXPORT virtual void kbengine_Destroy(void);
 	CLIENT_APP_EXPORT virtual bool kbengine_Login(const char* accountname, const char* passwd, const char* datas = NULL, KBEngine::uint32 datasize = 0, const char* ip = NULL, KBEngine::uint32 port = 0);
 	CLIENT_APP_EXPORT virtual bool kbengine_Logout(void);
-	CLIENT_APP_EXPORT virtual void kbengine_Reset(void);
+	void kbengine_Reset(void);
 	CLIENT_APP_EXPORT virtual bool kbengine_CreateAvatar(std::string avatarName);
 	CLIENT_APP_EXPORT virtual bool kbengine_RemoveAvatar(std::string avatarName);
 	CLIENT_APP_EXPORT virtual bool kbengine_SelectAvatarGame(KBEngine::DBID avatarDBID);

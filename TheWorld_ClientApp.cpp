@@ -4,7 +4,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/thread/thread.hpp>
 
-HINSTANCE g_hKBEngineDll = NULL;
+//HINSTANCE g_hKBEngineDll = NULL;
 
 // Default Account Name
 std::string g_defaultAccountName("6529868038458114048");
@@ -33,6 +33,7 @@ TheWorld_ClientApp::~TheWorld_ClientApp()
 
 bool TheWorld_ClientApp::kbengine_Init(void)
 {
+/*
 #ifdef _DEBUG
 	std::string kbenginedll_name = "TheWorld_ClientDll_d.dll";
 #else
@@ -47,7 +48,7 @@ bool TheWorld_ClientApp::kbengine_Init(void)
 		kbengine_PrintMessage(str);
 		return 0;
 	}
-
+*/
 	if (!kbe_init())
 	{
 		kbengine_PrintMessage("kbengine_init() is failed!");
@@ -64,7 +65,7 @@ void TheWorld_ClientApp::kbengine_Destroy(void)
 {
 	kbe_deregisterEventHandle(this);
 	kbe_destroy();
-	FreeLibrary(g_hKBEngineDll);
+	//FreeLibrary(g_hKBEngineDll);
 }
 
 void TheWorld_ClientApp::kbengine_Sleep(UINT32 ui)
