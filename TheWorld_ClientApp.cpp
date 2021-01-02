@@ -429,6 +429,7 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 		setLoginStatus(LOGIN_DONE);
 		strcpy(str, "KBE Event received ==> CLIENT_EVENT_LOGIN_SUCCESS\n");
 		kbengine_PrintMessage(str);
+		onLoginSuccess();
 	}
 	break;
 
@@ -447,6 +448,8 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 		}
 
 		kbengine_PrintMessage(str);
+
+		onLoginFailed(info->failedcode);
 	}
 	break;
 
@@ -713,11 +716,13 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 	case CLIENT_EVENT_SERVER_CLOSED:
 	{
 		//m_bServerClosed = true;
-		setShutdownRequired(true);
+		//setShutdownRequired(true);
 		setLoginStatus(LOGIN_NOT_DONE);
-		setInitAppModeRequired(false);
+		setAppMode(TheWorld_ClientApp::InitialMenu);
+		setInitAppModeRequired(true);
 		strcpy(str, "KBE Event received ==> CLIENT_EVENT_SERVER_CLOSED\n");
 		kbengine_PrintMessage(str);
+		onServerClosed();
 	}
 	break;
 
@@ -790,6 +795,7 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 		const KBEngine::EventData_onKicked* info = static_cast<const KBEngine::EventData_onKicked*>(lpEventData);
 		sprintf(str, "KBE Event received ==> CLIENT_EVENT_ON_KICKED (code=%u)!\n", info->failedcode);
 		kbengine_PrintMessage(str);
+		onKicked(info->failedcode);
 	}
 	break;
 

@@ -44,6 +44,10 @@ public:
 	CLIENT_APP_EXPORT virtual UINT64 kbengine_GenUUID64(void);
 	CLIENT_APP_EXPORT virtual void kbengine_PrintMessage(char* message, bool interline = false, bool console = true, KBEMessageType t = Print);
 	CLIENT_APP_EXPORT virtual void kbengine_UpdateVolatile(void);
+	virtual void onLoginSuccess(void) = 0;
+	virtual void onLoginFailed(int failCode) = 0;
+	virtual void onServerClosed(void) = 0;
+	virtual void onKicked(int failCode) = 0;
 	// *** KBEngine interaction ***
 
 	//virtual void setMain(TheWorld_ClientApp* pMain) { m_pMain = pMain; };
@@ -111,8 +115,8 @@ public:
 	virtual void setReinitAppModeRequired(bool b) { m_bReinitAppModeRequired = b; };
 	// config AppMode
 
-	virtual void setShutdownRequired(bool b) { m_bShutDown = b; };
-	virtual bool getShutdownRequired(void) { return m_bShutDown; };
+	virtual void setShutdownRequired(bool b) { m_bShutDownRequired = b; };
+	virtual bool getShutdownRequired(void) { return m_bShutDownRequired; };
 
 	bool playerEnterSpace(KBEngine::SPACE_ID spaceID)
 	{
@@ -148,7 +152,7 @@ public:
 
 private:
 	//TheWorld_ClientApp* m_pMain;
-	bool m_bShutDown;
+	bool m_bShutDownRequired;
 	enum TheWorld_ClientApp::_AppMode m_appMode;
 	bool m_bInitAppModeRequired;
 	bool m_bReinitAppModeRequired;
