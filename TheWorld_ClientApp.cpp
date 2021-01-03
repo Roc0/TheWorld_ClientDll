@@ -148,7 +148,8 @@ bool TheWorld_ClientApp::kbengine_CreateAvatar(std::string avatarName)
 	kbengine_PrintMessage(str);
 
 	kbe_lock();
-	sprintf(str, "[1, \"kbeconsole_%s\"]", avatarName.c_str());
+	//sprintf(str, "[1, \"kbeconsole_%s\"]", avatarName.c_str());
+	sprintf(str, "[1, \"%s\"]", avatarName.c_str());
 	kbe_callEntityMethod(kbe_playerID(), "reqCreateAvatar", str);
 	kbe_unlock();
 
@@ -503,6 +504,8 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 				sprintf(str, "\t\tAvatar DBID: [%ld] , Avatar Name: [%s]\n", (long)avatarDBID, name.c_str());
 				kbengine_PrintMessage(str, true);
 			}
+
+			onUpdateAvatars();
 		}
 		else
 		{

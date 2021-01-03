@@ -48,12 +48,14 @@ public:
 	virtual void onLoginFailed(int failCode) = 0;
 	virtual void onServerClosed(void) = 0;
 	virtual void onKicked(int failCode) = 0;
+	virtual void onUpdateAvatars(void) = 0;
 	// *** KBEngine interaction ***
 
 	//virtual void setMain(TheWorld_ClientApp* pMain) { m_pMain = pMain; };
 
 	void client_onEvent(const KBEngine::EventData* lpEventData);
 
+	// ENTITY
 	virtual void clearEntities(void) { m_Entities.clear(); };
 	virtual int eraseEntity(KBEngine::ENTITY_ID eid) { return m_Entities.erase(eid); };
 	virtual KBEntity* getEntity(KBEngine::ENTITY_ID eid, bool& bPlayer)
@@ -83,6 +85,7 @@ public:
 		return pEntity;
 	}
 
+	// AVATAR
 	virtual void clearAvatars(void) { m_Avatars.clear(); };
 	virtual int eraseAvatar(KBEngine::DBID dbid) { return m_Avatars.erase(dbid); };
 	virtual KBAvatar* getAvatar(KBEngine::DBID dbid)
