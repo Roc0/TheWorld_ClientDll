@@ -49,6 +49,9 @@ public:
 	virtual void onServerClosed(void) = 0;
 	virtual void onKicked(int failCode) = 0;
 	virtual void onUpdateAvatars(void) = 0;
+	virtual void onPlayerEnterSpace(KBEngine::SPACE_ID spaceId) = 0;
+	virtual void onPlayerLeaveSpace(KBEngine::SPACE_ID spaceId) = 0;
+	virtual void onAddSpaceGeoMapping(KBEngine::SPACE_ID, const char *resPath) = 0;
 	// *** KBEngine interaction ***
 
 	//virtual void setMain(TheWorld_ClientApp* pMain) { m_pMain = pMain; };
@@ -125,6 +128,7 @@ public:
 	{
 		m_bReinitAppModeRequired = true;
 		getSpaceWorld()->setPlayerSpaceId(spaceID);
+		onPlayerEnterSpace(spaceID);
 		return true;
 	};
 
@@ -134,6 +138,7 @@ public:
 			return;
 		getSpaceWorld()->setPlayerSpaceId(-1);
 		m_bReinitAppModeRequired = true;
+		onPlayerLeaveSpace(spaceID);
 	};
 
 	virtual void setDoSleepInMainLoop(bool b) { m_bDoSleepInMainLoop = b; };

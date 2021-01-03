@@ -782,6 +782,7 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 		getSpaceWorld()->addSpace(spaceID, pEventData->respath.c_str());
 		sprintf(str, "KBE Event received ==> CLIENT_EVENT_ADDSPACEGEOMAPPING, SpaceID %d, ResPath %s\n", (int)spaceID, pEventData->respath.c_str());
 		kbengine_PrintMessage(str, true);
+		onAddSpaceGeoMapping(spaceID, pEventData->respath.c_str());
 	}
 	break;
 
