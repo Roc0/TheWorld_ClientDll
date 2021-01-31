@@ -48,7 +48,12 @@ public:
 	virtual void onLoginFailed(int failCode) = 0;
 	virtual void onServerClosed(void) = 0;
 	virtual void onKicked(int failCode) = 0;
+	virtual void onClearEntities(void) = 0;
+	virtual void onCreatedEntity(KBEngine::ENTITY_ID eid, bool bPlayer) = 0;
+	virtual void onEraseEntity(KBEngine::ENTITY_ID eid) = 0;
+	virtual void onClearAvatars(void) = 0;
 	virtual void onUpdateAvatars(void) = 0;
+	virtual void onEraseAvatar(KBEngine::DBID dbid) = 0;
 	virtual void onPlayerEnterSpace(KBEngine::SPACE_ID spaceId) = 0;
 	virtual void onPlayerLeaveSpace(KBEngine::SPACE_ID spaceId) = 0;
 	virtual void onAddSpaceGeoMapping(KBEngine::SPACE_ID, const char *resPath) = 0;
@@ -59,8 +64,8 @@ public:
 	void client_onEvent(const KBEngine::EventData* lpEventData);
 
 	// ENTITY
-	virtual void clearEntities(void) { m_Entities.clear(); };
-	virtual int eraseEntity(KBEngine::ENTITY_ID eid) { return m_Entities.erase(eid); };
+	virtual void clearEntities(void) { onClearEntities();	m_Entities.clear(); };
+	virtual int eraseEntity(KBEngine::ENTITY_ID eid) { onEraseEntity(eid);	return m_Entities.erase(eid); };
 	virtual KBEntity* getEntity(KBEngine::ENTITY_ID eid, bool& bPlayer)
 	{
 		bPlayer = false; 
@@ -85,12 +90,15 @@ public:
 		else
 			pEntity = new OtherEntity(eid, getSpaceWorld());
 		m_Entities[eid].reset(pEntity);
+		
+		onCreatedEntity(eid, bPlayer);
+		
 		return pEntity;
 	}
 
 	// AVATAR
-	virtual void clearAvatars(void) { m_Avatars.clear(); };
-	virtual int eraseAvatar(KBEngine::DBID dbid) { return m_Avatars.erase(dbid); };
+	virtual void clearAvatars(void) { onClearAvatars();	 m_Avatars.clear(); };
+	virtual int eraseAvatar(KBEngine::DBID dbid) { onEraseAvatar(dbid); return m_Avatars.erase(dbid); };
 	virtual KBAvatar* getAvatar(KBEngine::DBID dbid)
 	{
 		AVATARS::iterator iter = m_Avatars.find(dbid);
