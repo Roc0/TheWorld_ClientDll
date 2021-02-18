@@ -35,8 +35,10 @@ public:
 		z = m_destPos.z;
 	}
 
-	void setPosition(float x, float y, float z)
+	void setLastKnownServerPosition(float x, float y, float z)
 	{
+		setServerPosition(x, y ,z);
+		
 		if (x)
 			m_pos.x = x;
 		if (y)
@@ -45,7 +47,21 @@ public:
 			m_pos.z = z;
 	}
 
-	void getPosition(float& x, float& y, float& z)
+	void getServerPosition(float& x, float& y, float& z)
+	{
+		x = m_ServerPos.x;
+		y = m_ServerPos.y;
+		z = m_ServerPos.z;
+	}
+		
+	void setServerPosition(float x, float y, float z)
+	{
+		m_ServerPos.x = x;
+		m_ServerPos.y = y;
+		m_ServerPos.z = z;
+	}
+		
+	void getLastKnownServerPosition(float& x, float& y, float& z)
 	{
 		x = m_pos.x;
 		y = m_pos.y;
@@ -181,7 +197,7 @@ protected:
 	int m_eid;				// entityID
 	int m_spaceId;
 	float m_moveSpeed;
-	_Vector3 m_destPos, m_pos, m_destDir, m_dir;
+	_Vector3 m_destPos, m_pos, m_ServerPos, m_destDir, m_dir;
 	bool m_bIsOnGround;
 	std::string m_res;
 	SpaceWorld *m_pSpaceWorld;

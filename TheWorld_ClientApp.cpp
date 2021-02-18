@@ -246,7 +246,7 @@ void TheWorld_ClientApp::kbengine_UpdateVolatile(void)
 
 		kbe_updateVolatile(eid, x, y, z, yaw, pitch, roll);
 
-		pPlayer->setPosition(x, y, z);
+		pPlayer->setLastKnownServerPosition(x, y, z);
 		pPlayer->setDirection(yaw, pitch, roll);
 	}
 }
@@ -282,7 +282,7 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 		if (bPlayer)
 			setPlayerEntity(pEntity);
 
-		pEntity->setPosition(pEventData_EnterWorld->x, pEventData_EnterWorld->y, pEventData_EnterWorld->z);
+		pEntity->setLastKnownServerPosition(pEventData_EnterWorld->x, pEventData_EnterWorld->y, pEventData_EnterWorld->z);
 		if (bPlayer)
 			pEntity->setDesideredPosition(pEventData_EnterWorld->x, pEventData_EnterWorld->y, pEventData_EnterWorld->z);
 		pEntity->setDirection(pEventData_EnterWorld->yaw, pEventData_EnterWorld->pitch, pEventData_EnterWorld->roll);
@@ -352,7 +352,7 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 			break;
 		}
 
-		pEntity->setPosition(pEventData_EnterSpace->x, pEventData_EnterSpace->y, pEventData_EnterSpace->z);
+		pEntity->setLastKnownServerPosition(pEventData_EnterSpace->x, pEventData_EnterSpace->y, pEventData_EnterSpace->z);
 		if (bPlayer)
 			pEntity->setDesideredPosition(pEventData_EnterSpace->x, pEventData_EnterSpace->y, pEventData_EnterSpace->z);
 		pEntity->setDirection(pEventData_EnterSpace->yaw, pEventData_EnterSpace->pitch, pEventData_EnterSpace->roll);
@@ -663,7 +663,7 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 			break;
 		}
 
-		pEntity->setPosition(pEventData->x, pEventData->y, pEventData->z);
+		pEntity->setLastKnownServerPosition(pEventData->x, pEventData->y, pEventData->z);
 		if (bPlayer)
 			pEntity->setDesideredPosition(pEventData->x, pEventData->y, pEventData->z);
 
@@ -743,7 +743,7 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 			break;
 		}
 
-		pEntity->setPosition(pEventData->x, pEventData->y, pEventData->z);
+		pEntity->setLastKnownServerPosition(pEventData->x, pEventData->y, pEventData->z);
 		if (bPlayer)
 			pEntity->setDesideredPosition(pEventData->x, pEventData->y, pEventData->z);
 
