@@ -59,6 +59,8 @@ public:
 	virtual void onAddSpaceGeoMapping(KBEngine::SPACE_ID, const char *resPath) = 0;
 	// *** KBEngine interaction ***
 
+	virtual bool isDebugEnabled(void) = 0;
+
 	//virtual void setMain(TheWorld_ClientApp* pMain) { m_pMain = pMain; };
 
 	void client_onEvent(const KBEngine::EventData* lpEventData);
