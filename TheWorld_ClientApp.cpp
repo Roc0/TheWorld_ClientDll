@@ -182,6 +182,11 @@ bool TheWorld_ClientApp::kbengine_SelectAvatarGame(KBEngine::DBID avatarDBID)
 	return true;
 }
 
+void TheWorld_ClientApp::kbengine_Relive(void)
+{
+	kbe_fireEvent("relive", NULL);
+}
+
 void TheWorld_ClientApp::kbengine_Reset(void)
 {
 	kbe_reset();
@@ -241,13 +246,13 @@ void TheWorld_ClientApp::kbengine_UpdateVolatile(void)
 	{
 		KBEngine::ENTITY_ID eid = (getTargetEntity() == NULL ? -1 : getTargetEntity()->id());
 		float x = 0, y = 0, z = 0, yaw = 0, pitch = 0, roll = 0;
-		pPlayer->getNewPlayerPosition(x, y, z);
-		pPlayer->getNewPlayerDirection(yaw, pitch, roll);
+		pPlayer->getForClientPosition(x, y, z);
+		pPlayer->getForClientDirection(yaw, pitch, roll);
 
 		kbe_updateVolatile(eid, x, y, z, yaw, pitch, roll);
 
 		//pPlayer->setForClientPosition(x, y, z);
-		pPlayer->setForClientDirection(yaw, pitch, roll);
+		//pPlayer->setForClientDirection(yaw, pitch, roll);
 	}
 }
 
@@ -283,11 +288,11 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 			setPlayerEntity(pEntity);
 
 		pEntity->setKnowByServerPosition(pEventData_EnterWorld->x, pEventData_EnterWorld->y, pEventData_EnterWorld->z);
-		if (bPlayer)
-			pEntity->setNewPlayerPosition(pEventData_EnterWorld->x, pEventData_EnterWorld->y, pEventData_EnterWorld->z);
+		//if (bPlayer)
+		//	pEntity->setNewPlayerPosition(pEventData_EnterWorld->x, pEventData_EnterWorld->y, pEventData_EnterWorld->z);
 		pEntity->setKnowByServerDirection(pEventData_EnterWorld->yaw, pEventData_EnterWorld->pitch, pEventData_EnterWorld->roll);
-		if (bPlayer)
-			pEntity->setNewPlayerDirection(pEventData_EnterWorld->yaw, pEventData_EnterWorld->pitch, pEventData_EnterWorld->roll);
+		//if (bPlayer)
+		//	pEntity->setNewPlayerDirection(pEventData_EnterWorld->yaw, pEventData_EnterWorld->pitch, pEventData_EnterWorld->roll);
 		pEntity->setMoveSpeed(pEventData_EnterWorld->speed);
 		pEntity->setSpaceID(pEventData_EnterWorld->spaceID);
 		pEntity->setIsOnGround(pEventData_EnterWorld->isOnGround);
@@ -359,11 +364,11 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 		}
 
 		pEntity->setKnowByServerPosition(pEventData_EnterSpace->x, pEventData_EnterSpace->y, pEventData_EnterSpace->z);
-		if (bPlayer)
-			pEntity->setNewPlayerPosition(pEventData_EnterSpace->x, pEventData_EnterSpace->y, pEventData_EnterSpace->z);
+		//if (bPlayer)
+		//	pEntity->setNewPlayerPosition(pEventData_EnterSpace->x, pEventData_EnterSpace->y, pEventData_EnterSpace->z);
 		pEntity->setKnowByServerDirection(pEventData_EnterSpace->yaw, pEventData_EnterSpace->pitch, pEventData_EnterSpace->roll);
-		if (bPlayer)
-			pEntity->setNewPlayerDirection(pEventData_EnterSpace->yaw, pEventData_EnterSpace->pitch, pEventData_EnterSpace->roll);
+		//if (bPlayer)
+		//	pEntity->setNewPlayerDirection(pEventData_EnterSpace->yaw, pEventData_EnterSpace->pitch, pEventData_EnterSpace->roll);
 		pEntity->setMoveSpeed(pEventData_EnterSpace->speed);
 		pEntity->setSpaceID(pEventData_EnterSpace->spaceID);
 		pEntity->setIsOnGround(pEventData_EnterSpace->isOnGround);
@@ -699,6 +704,7 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 				uint32_t skillID = root[2].asUInt();
 				uint32_t damageType = root[3].asUInt();
 				uint32_t damage = root[4].asUInt();
+				uint32_t HP = root[5].asUInt();
 
 				bool bPlayer = false;
 				KBEntity* attacker = getEntity(attackerID, bPlayer);
@@ -713,11 +719,12 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 				if (receiver)
 				{
 					receiver->recvDamage(attacker, skillID, damageType, damage);
+					receiver->setHP(HP);
 				}
 
 				if (isDebugEnabled())
 				{
-					sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT, EntityID: %d, peventdata->name: %s, EID Attacker: %d, skillId: %d, damageType: %d, damage: %d\n", (int)eid, peventdata->name.c_str(), (int)eidAttacker, (int)skillID, (int)damageType, (int)damage);
+					sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT, EntityID: %d, peventdata->name: %s, EID Attacker: %d, skillId: %d, damageType: %d, damage: %d, HP: %d\n", (int)eid, peventdata->name.c_str(), (int)eidAttacker, (int)skillID, (int)damageType, (int)damage, (int)HP);
 					kbengine_PrintMessage(str);
 				}
 			}
@@ -744,8 +751,8 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 		}
 
 		pEntity->setKnowByServerPosition(pEventData->x, pEventData->y, pEventData->z);
-		if (bPlayer)
-			pEntity->setNewPlayerPosition(pEventData->x, pEventData->y, pEventData->z);
+		//if (bPlayer)
+		//	pEntity->setNewPlayerPosition(pEventData->x, pEventData->y, pEventData->z);
 
 		if (isDebugEnabled())
 		{
@@ -773,8 +780,8 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 		}
 
 		pEntity->setKnowByServerDirection(pEventData->yaw, pEventData->pitch, pEventData->roll);
-		if (bPlayer)
-			pEntity->setNewPlayerDirection(pEventData->yaw, pEventData->pitch, pEventData->roll);
+		//if (bPlayer)
+		//	pEntity->setNewPlayerDirection(pEventData->yaw, pEventData->pitch, pEventData->roll);
 
 		if (isDebugEnabled())
 		{
@@ -847,8 +854,8 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 		}
 
 		pEntity->setKnowByServerPosition(pEventData->x, pEventData->y, pEventData->z);
-		if (bPlayer)
-			pEntity->setNewPlayerPosition(pEventData->x, pEventData->y, pEventData->z);
+		//if (bPlayer)
+		//	pEntity->setNewPlayerPosition(pEventData->x, pEventData->y, pEventData->z);
 
 		if (isDebugEnabled())
 		{
@@ -876,8 +883,8 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 		}
 
 		pEntity->setKnowByServerDirection(pEventData->yaw, pEventData->pitch, pEventData->roll);
-		if (bPlayer)
-			pEntity->setNewPlayerDirection(pEventData->yaw, pEventData->pitch, pEventData->roll);
+		//if (bPlayer)
+		//	pEntity->setNewPlayerDirection(pEventData->yaw, pEventData->pitch, pEventData->roll);
 
 		if (isDebugEnabled())
 		{

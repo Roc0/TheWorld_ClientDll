@@ -9,6 +9,7 @@ KBEntity::KBEntity(int eid, SpaceWorld *spaceWorld)
 	m_pSpaceWorld = spaceWorld;
 	m_bIsPlayer = false;
 	m_ServerPos.x = m_ServerPos.y = m_ServerPos.z = 0;
+	m_state = ENTITY_STATE_FREE;
 }
 
 KBEntity::~KBEntity()

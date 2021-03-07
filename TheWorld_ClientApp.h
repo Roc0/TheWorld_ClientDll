@@ -32,6 +32,7 @@ public:
 	CLIENT_APP_EXPORT virtual bool kbengine_Login(const char* accountname, const char* passwd, const char* datas = NULL, KBEngine::uint32 datasize = 0, const char* ip = NULL, KBEngine::uint32 port = 0);
 	CLIENT_APP_EXPORT virtual bool kbengine_Logout(void);
 	void kbengine_Reset(void);
+	CLIENT_APP_EXPORT virtual void kbengine_Relive(void);
 	CLIENT_APP_EXPORT virtual void kbengine_onEvent(const KBEngine::EventData* lpEventData);
 	CLIENT_APP_EXPORT virtual void kbengine_Sleep(UINT32 ui);
 	CLIENT_APP_EXPORT virtual void kbengine_MessagePump(TheWorld_ClientApp* clientApp);

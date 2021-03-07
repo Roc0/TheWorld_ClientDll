@@ -18,9 +18,9 @@ protected:
 public:
 	virtual ~KBEntity();
 
-	void setNewPlayerPosition(float x, float y, float z)
+	/*void setNewPlayerPosition(float x, float y, float z)
 	{
-		setForClientPosition(x, y, z);
+		//setForClientPosition(x, y, z);
 		return;
 
 		if (x)
@@ -33,7 +33,7 @@ public:
 
 	void getNewPlayerPosition(float& x, float& y, float& z)
 	{
-		return getForClientPosition(x, y, z);
+		//return getForClientPosition(x, y, z);
 		
 		x = m_destPos.x;
 		y = m_destPos.y;
@@ -55,7 +55,7 @@ public:
 		yaw = m_destDir.z;
 		pitch = m_destDir.y;
 		roll = m_destDir.x;
-	}
+	}*/
 
 	void setKnowByServerPosition(float x, float y, float z)
 	{
@@ -195,9 +195,24 @@ public:
 		m_state = state;
 	}
 
+	uint32_t getState(void)
+	{
+		return m_state;
+	}
+
 	void setHPMax(uint32_t HPMax)
 	{
 		m_HPMax = HPMax;
+	}
+
+	void setHP(uint32_t HP)
+	{
+		m_HP = HP;
+	}
+
+	uint32_t getHP(void)
+	{
+		return m_HP;
 	}
 
 	void setMPMax(uint32_t MPMax)
@@ -230,6 +245,12 @@ protected:
 
 	uint32_t m_modelId;
 	int32_t m_state;
-	int32_t m_HPMax;
-	int32_t m_MPMax;
+#define ENTITY_STATE_UNKNOW		-1
+#define ENTITY_STATE_FREE		0
+#define ENTITY_STATE_DEAD		1
+#define ENTITY_STATE_REST		2
+#define ENTITY_STATE_FIGHT		3
+#define ENTITY_STATE_MAX		4
+	int32_t m_HPMax, m_HP;
+	int32_t m_MPMax, m_MP;
 };
