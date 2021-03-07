@@ -20,6 +20,9 @@ public:
 
 	void setNewPlayerPosition(float x, float y, float z)
 	{
+		setForClientPosition(x, y, z);
+		return;
+
 		if (x)
 			m_destPos.x = x;
 		if (y)
@@ -30,42 +33,11 @@ public:
 
 	void getNewPlayerPosition(float& x, float& y, float& z)
 	{
+		return getForClientPosition(x, y, z);
+		
 		x = m_destPos.x;
 		y = m_destPos.y;
 		z = m_destPos.z;
-	}
-
-	void setForClientPosition(float x, float y, float z)
-	{
-		setKnowByServerPosition(x, y ,z);
-		
-		if (x)
-			m_pos.x = x;
-		if (y)
-			m_pos.y = y;
-		if (z)
-			m_pos.z = z;
-	}
-
-	void getKnowByServerPosition(float& x, float& y, float& z)
-	{
-		x = m_ServerPos.x;
-		y = m_ServerPos.y;
-		z = m_ServerPos.z;
-	}
-		
-	void setKnowByServerPosition(float x, float y, float z)
-	{
-		m_ServerPos.x = x;
-		m_ServerPos.y = y;
-		m_ServerPos.z = z;
-	}
-		
-	void getForClientPosition(float& x, float& y, float& z)
-	{
-		x = m_pos.x;
-		y = m_pos.y;
-		z = m_pos.z;
 	}
 
 	void setNewPlayerDirection(float yaw, float pitch, float roll)
@@ -85,17 +57,66 @@ public:
 		roll = m_destDir.x;
 	}
 
-	void setDirection(float yaw, float pitch, float roll)
+	void setKnowByServerPosition(float x, float y, float z)
 	{
-		if (yaw)
+		setForClientPosition(x, y, z);
+
+		m_ServerPos.x = x;
+		m_ServerPos.y = y;
+		m_ServerPos.z = z;
+	}
+
+	void getKnowByServerPosition(float& x, float& y, float& z)
+	{
+		x = m_ServerPos.x;
+		y = m_ServerPos.y;
+		z = m_ServerPos.z;
+	}
+		
+	void setForClientPosition(float x, float y, float z)
+	{
+		//if (x)
+			m_pos.x = x;
+		//if (y)
+			m_pos.y = y;
+		//if (z)
+			m_pos.z = z;
+	}
+
+	void getForClientPosition(float& x, float& y, float& z)
+	{
+		x = m_pos.x;
+		y = m_pos.y;
+		z = m_pos.z;
+	}
+
+	void setKnowByServerDirection(float yaw, float pitch, float roll)
+	{
+		setForClientDirection(yaw, pitch, roll);
+		
+		m_ServerDir.z = yaw;
+		m_ServerDir.y = pitch;
+		m_ServerDir.x = roll;
+	}
+
+	void getKnowByServerDirection(float& yaw, float& pitch, float& roll)
+	{
+		yaw = m_ServerDir.z;
+		pitch = m_ServerDir.y;
+		roll = m_ServerDir.x;
+	}
+
+	void setForClientDirection(float yaw, float pitch, float roll)
+	{
+		//if (yaw)
 			m_dir.z = yaw;
-		if (pitch)
+		//if (pitch)
 			m_dir.y = pitch;
-		if (roll)
+		//if (roll)
 			m_dir.x = roll;
 	}
 
-	void getDirection(float& yaw, float& pitch, float& roll)
+	void getForClientDirection(float& yaw, float& pitch, float& roll)
 	{
 		yaw = m_dir.z;
 		pitch = m_dir.y;
@@ -197,7 +218,7 @@ protected:
 	int m_eid;				// entityID
 	int m_spaceId;
 	float m_moveSpeed;
-	_Vector3 m_destPos, m_pos, m_ServerPos, m_destDir, m_dir;
+	_Vector3 m_destPos, m_pos, m_ServerPos, m_destDir, m_dir, m_ServerDir;
 	bool m_bIsOnGround;
 	std::string m_res;
 	SpaceWorld *m_pSpaceWorld;
