@@ -18,7 +18,7 @@ protected:
 public:
 	virtual ~KBEntity();
 
-	void setDesideredPosition(float x, float y, float z)
+	void setNewPlayerPosition(float x, float y, float z)
 	{
 		if (x)
 			m_destPos.x = x;
@@ -28,16 +28,16 @@ public:
 			m_destPos.z = z;
 	}
 
-	void getDesideredPosition(float& x, float& y, float& z)
+	void getNewPlayerPosition(float& x, float& y, float& z)
 	{
 		x = m_destPos.x;
 		y = m_destPos.y;
 		z = m_destPos.z;
 	}
 
-	void setLastKnownServerPosition(float x, float y, float z)
+	void setForClientPosition(float x, float y, float z)
 	{
-		setServerPosition(x, y ,z);
+		setKnowByServerPosition(x, y ,z);
 		
 		if (x)
 			m_pos.x = x;
@@ -47,28 +47,28 @@ public:
 			m_pos.z = z;
 	}
 
-	void getServerPosition(float& x, float& y, float& z)
+	void getKnowByServerPosition(float& x, float& y, float& z)
 	{
 		x = m_ServerPos.x;
 		y = m_ServerPos.y;
 		z = m_ServerPos.z;
 	}
 		
-	void setServerPosition(float x, float y, float z)
+	void setKnowByServerPosition(float x, float y, float z)
 	{
 		m_ServerPos.x = x;
 		m_ServerPos.y = y;
 		m_ServerPos.z = z;
 	}
 		
-	void getLastKnownServerPosition(float& x, float& y, float& z)
+	void getForClientPosition(float& x, float& y, float& z)
 	{
 		x = m_pos.x;
 		y = m_pos.y;
 		z = m_pos.z;
 	}
 
-	void setDesideredDirection(float yaw, float pitch, float roll)
+	void setNewPlayerDirection(float yaw, float pitch, float roll)
 	{
 		if (yaw)
 			m_destDir.x = roll;
@@ -78,7 +78,7 @@ public:
 			m_destDir.z = yaw;
 	}
 
-	void getDesideredDirection(float& yaw, float& pitch, float& roll)
+	void getNewPlayerDirection(float& yaw, float& pitch, float& roll)
 	{
 		yaw = m_destDir.z;
 		pitch = m_destDir.y;

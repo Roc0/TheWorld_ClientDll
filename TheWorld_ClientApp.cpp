@@ -241,12 +241,12 @@ void TheWorld_ClientApp::kbengine_UpdateVolatile(void)
 	{
 		KBEngine::ENTITY_ID eid = (getTargetEntity() == NULL ? -1 : getTargetEntity()->id());
 		float x = 0, y = 0, z = 0, yaw = 0, pitch = 0, roll = 0;
-		pPlayer->getDesideredPosition(x, y, z);
-		pPlayer->getDesideredDirection(yaw, pitch, roll);
+		pPlayer->getNewPlayerPosition(x, y, z);
+		pPlayer->getNewPlayerDirection(yaw, pitch, roll);
 
 		kbe_updateVolatile(eid, x, y, z, yaw, pitch, roll);
 
-		pPlayer->setLastKnownServerPosition(x, y, z);
+		pPlayer->setForClientPosition(x, y, z);
 		pPlayer->setDirection(yaw, pitch, roll);
 	}
 }
@@ -282,12 +282,12 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 		if (bPlayer)
 			setPlayerEntity(pEntity);
 
-		pEntity->setLastKnownServerPosition(pEventData_EnterWorld->x, pEventData_EnterWorld->y, pEventData_EnterWorld->z);
+		pEntity->setForClientPosition(pEventData_EnterWorld->x, pEventData_EnterWorld->y, pEventData_EnterWorld->z);
 		if (bPlayer)
-			pEntity->setDesideredPosition(pEventData_EnterWorld->x, pEventData_EnterWorld->y, pEventData_EnterWorld->z);
+			pEntity->setNewPlayerPosition(pEventData_EnterWorld->x, pEventData_EnterWorld->y, pEventData_EnterWorld->z);
 		pEntity->setDirection(pEventData_EnterWorld->yaw, pEventData_EnterWorld->pitch, pEventData_EnterWorld->roll);
 		if (bPlayer)
-			pEntity->setDesideredDirection(pEventData_EnterWorld->yaw, pEventData_EnterWorld->pitch, pEventData_EnterWorld->roll);
+			pEntity->setNewPlayerDirection(pEventData_EnterWorld->yaw, pEventData_EnterWorld->pitch, pEventData_EnterWorld->roll);
 		pEntity->setMoveSpeed(pEventData_EnterWorld->speed);
 		pEntity->setSpaceID(pEventData_EnterWorld->spaceID);
 		pEntity->setIsOnGround(pEventData_EnterWorld->isOnGround);
@@ -358,12 +358,12 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 			break;
 		}
 
-		pEntity->setLastKnownServerPosition(pEventData_EnterSpace->x, pEventData_EnterSpace->y, pEventData_EnterSpace->z);
+		pEntity->setForClientPosition(pEventData_EnterSpace->x, pEventData_EnterSpace->y, pEventData_EnterSpace->z);
 		if (bPlayer)
-			pEntity->setDesideredPosition(pEventData_EnterSpace->x, pEventData_EnterSpace->y, pEventData_EnterSpace->z);
+			pEntity->setNewPlayerPosition(pEventData_EnterSpace->x, pEventData_EnterSpace->y, pEventData_EnterSpace->z);
 		pEntity->setDirection(pEventData_EnterSpace->yaw, pEventData_EnterSpace->pitch, pEventData_EnterSpace->roll);
 		if (bPlayer)
-			pEntity->setDesideredDirection(pEventData_EnterSpace->yaw, pEventData_EnterSpace->pitch, pEventData_EnterSpace->roll);
+			pEntity->setNewPlayerDirection(pEventData_EnterSpace->yaw, pEventData_EnterSpace->pitch, pEventData_EnterSpace->roll);
 		pEntity->setMoveSpeed(pEventData_EnterSpace->speed);
 		pEntity->setSpaceID(pEventData_EnterSpace->spaceID);
 		pEntity->setIsOnGround(pEventData_EnterSpace->isOnGround);
@@ -743,9 +743,9 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 			break;
 		}
 
-		pEntity->setLastKnownServerPosition(pEventData->x, pEventData->y, pEventData->z);
+		pEntity->setForClientPosition(pEventData->x, pEventData->y, pEventData->z);
 		if (bPlayer)
-			pEntity->setDesideredPosition(pEventData->x, pEventData->y, pEventData->z);
+			pEntity->setNewPlayerPosition(pEventData->x, pEventData->y, pEventData->z);
 
 		if (isDebugEnabled())
 		{
@@ -774,7 +774,7 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 
 		pEntity->setDirection(pEventData->yaw, pEventData->pitch, pEventData->roll);
 		if (bPlayer)
-			pEntity->setDesideredDirection(pEventData->yaw, pEventData->pitch, pEventData->roll);
+			pEntity->setNewPlayerDirection(pEventData->yaw, pEventData->pitch, pEventData->roll);
 
 		if (isDebugEnabled())
 		{
@@ -846,9 +846,9 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 			break;
 		}
 
-		pEntity->setLastKnownServerPosition(pEventData->x, pEventData->y, pEventData->z);
+		pEntity->setForClientPosition(pEventData->x, pEventData->y, pEventData->z);
 		if (bPlayer)
-			pEntity->setDesideredPosition(pEventData->x, pEventData->y, pEventData->z);
+			pEntity->setNewPlayerPosition(pEventData->x, pEventData->y, pEventData->z);
 
 		if (isDebugEnabled())
 		{
@@ -877,7 +877,7 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 
 		pEntity->setDirection(pEventData->yaw, pEventData->pitch, pEventData->roll);
 		if (bPlayer)
-			pEntity->setDesideredDirection(pEventData->yaw, pEventData->pitch, pEventData->roll);
+			pEntity->setNewPlayerDirection(pEventData->yaw, pEventData->pitch, pEventData->roll);
 
 		if (isDebugEnabled())
 		{
