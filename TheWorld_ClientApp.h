@@ -55,8 +55,12 @@ public:
 	virtual void onClearAvatars(void) = 0;
 	virtual void onUpdateAvatars(void) = 0;
 	virtual void onEraseAvatar(KBEngine::DBID dbid) = 0;
-	virtual void onPlayerEnterSpace(KBEngine::SPACE_ID spaceId) = 0;
-	virtual void onPlayerLeaveSpace(KBEngine::SPACE_ID spaceId) = 0;
+	virtual void onEntityEnterWorld(KBEngine::ENTITY_ID eid) = 0;
+	virtual void onEntityLeaveWorld(KBEngine::ENTITY_ID eid) = 0;
+	virtual void onEntityEnterSpace(KBEngine::ENTITY_ID eid, KBEngine::SPACE_ID spaceId) = 0;
+	virtual void onEntityLeaveSpace(KBEngine::ENTITY_ID eid, KBEngine::SPACE_ID spaceId) = 0;
+	virtual void onPlayerEnterSpace(KBEngine::ENTITY_ID eid, KBEngine::SPACE_ID spaceId) = 0;
+	virtual void onPlayerLeaveSpace(KBEngine::ENTITY_ID eid, KBEngine::SPACE_ID spaceId) = 0;
 	virtual void onAddSpaceGeoMapping(KBEngine::SPACE_ID, const char *resPath) = 0;
 	// *** KBEngine interaction ***
 
@@ -135,21 +139,21 @@ public:
 	virtual void setShutdownRequired(bool b) { m_bShutDownRequired = b; };
 	virtual bool getShutdownRequired(void) { return m_bShutDownRequired; };
 
-	bool playerEnterSpace(KBEngine::SPACE_ID spaceID)
+	bool playerEnterSpace(KBEngine::ENTITY_ID eid, KBEngine::SPACE_ID spaceID)
 	{
 		m_bReinitAppModeRequired = true;
 		getSpaceWorld()->setPlayerSpaceId(spaceID);
-		onPlayerEnterSpace(spaceID);
+		onPlayerEnterSpace(eid, spaceID);
 		return true;
 	};
 
-	void playerLeaveSpace(KBEngine::SPACE_ID spaceID)
+	void playerLeaveSpace(KBEngine::ENTITY_ID eid, KBEngine::SPACE_ID spaceID)
 	{
 		if (getSpaceWorld()->getPlayerSpaceId() != spaceID)
 			return;
 		getSpaceWorld()->setPlayerSpaceId(-1);
 		m_bReinitAppModeRequired = true;
-		onPlayerLeaveSpace(spaceID);
+		onPlayerLeaveSpace(eid, spaceID);
 	};
 
 	virtual void setDoSleepInMainLoop(bool b) { m_bDoSleepInMainLoop = b; };

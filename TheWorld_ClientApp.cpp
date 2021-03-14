@@ -300,6 +300,8 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 
 		pEntity->setIsInWorld(true);
 
+		onEntityEnterWorld(eid);
+
 		if (isDebugEnabled())
 		{
 			sprintf(str, "KBE Event received ==> CLIENT_EVENT_ENTERWORLD - %s - EntityID: %d, SpaceID: %d, Yaw/Pitch/Roll: %f/%f/%f, X/Y/Z: %f/%f/%f, Speed: %f, IsOnGround: %d, Res: %s\n", bPlayer ? "PLAYER" : "OTHER",
@@ -333,6 +335,8 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 			setMouseTarget(NULL);
 
 		eraseEntity(eid);
+
+		onEntityLeaveWorld(eid);
 
 		if (isDebugEnabled())
 		{
@@ -376,6 +380,14 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 
 		pEntity->setIsInWorld(true);
 
+		onEntityEnterSpace(eid, pEventData_EnterSpace->spaceID);
+
+		if (bPlayer)
+		{
+			setAppMode(TheWorld_ClientApp::WorldMode);
+			playerEnterSpace(eid, pEventData_EnterSpace->spaceID);
+		}
+
 		if (isDebugEnabled())
 		{
 			sprintf(str, "KBE Event received ==> CLIENT_EVENT_ENTERSPACE - %s - EntityID: %d, SpaceID: %d, Yaw/Pitch/Roll: %f/%f/%f, X/Y/Z: %f/%f/%f, Speed: %f, IsOnGround: %d, Res: %s\n", bPlayer ? "PLAYER" : "OTHER",
@@ -384,12 +396,6 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 				pEventData_EnterSpace->x, pEventData_EnterSpace->y, pEventData_EnterSpace->z,
 				pEventData_EnterSpace->speed, pEventData_EnterSpace->isOnGround, pEventData_EnterSpace->res.c_str());
 			kbengine_PrintMessage(str, true);
-		}
-
-		if (bPlayer)
-		{
-			setAppMode(TheWorld_ClientApp::WorldMode);
-			playerEnterSpace(pEventData_EnterSpace->spaceID);
 		}
 	}
 	break;
@@ -414,15 +420,17 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 
 		eraseEntity(eid);
 
+		onEntityLeaveSpace(eid, spaceId);
+		
+		if (bPlayer)
+		{
+			playerLeaveSpace(eid, spaceId);
+		}
+
 		if (isDebugEnabled())
 		{
 			sprintf(str, "KBE Event received ==> CLIENT_EVENT_LEAVESPACE - %s - EntityID %d, SpaceID: %d\n", bPlayer ? "PLAYER" : "OTHER", (int)eid, (int)spaceId);
 			kbengine_PrintMessage(str);
-		}
-
-		if (bPlayer)
-		{
-			playerLeaveSpace(spaceId);
 		}
 	}
 	break;
