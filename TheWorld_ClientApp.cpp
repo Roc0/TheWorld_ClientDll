@@ -685,6 +685,50 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 					kbengine_PrintMessage(str);
 				}
 			}
+			else if (peventdata->name == "set_HP_Max")
+			{
+				if (pEntity == NULL)
+				{
+					if (isDebugEnabled())
+					{
+						sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT (ENTITY NOT FOUND), EntityID: %d, peventdata->name: %s\n", (int)eid, peventdata->name.c_str());
+						kbengine_PrintMessage(str);
+					}
+					break;
+				}
+
+				int32_t v = root[1].asInt();
+				pEntity->setHPMax(v);
+				onMaxHPChanged(eid, v);
+
+				if (isDebugEnabled())
+				{
+					sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT, EntityID: %d, peventdata->name: %s, HPMax: %d\n", (int)eid, peventdata->name.c_str(), (int)v);
+					kbengine_PrintMessage(str);
+				}
+			}
+			else if (peventdata->name == "set_HP")
+			{
+				if (pEntity == NULL)
+				{
+					if (isDebugEnabled())
+					{
+						sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT (ENTITY NOT FOUND), EntityID: %d, peventdata->name: %s\n", (int)eid, peventdata->name.c_str());
+						kbengine_PrintMessage(str);
+					}
+					break;
+				}
+
+				int32_t v = root[1].asInt();
+				pEntity->setHP(v);
+				onHPChanged(eid, v);
+
+				if (isDebugEnabled())
+				{
+					sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT, EntityID: %d, peventdata->name: %s, HP: %d\n", (int)eid, peventdata->name.c_str(), (int)v);
+					kbengine_PrintMessage(str);
+				}
+			}
 			else if (peventdata->name == "set_MP_Max")
 			{
 				if (pEntity == NULL)
@@ -699,10 +743,33 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 
 				int32_t v = root[1].asInt();
 				pEntity->setMPMax(v);
+				onMaxMPChanged(eid, v);
 
 				if (isDebugEnabled())
 				{
 					sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT, EntityID: %d, peventdata->name: %s, MPMax: %d\n", (int)eid, peventdata->name.c_str(), (int)v);
+					kbengine_PrintMessage(str);
+				}
+			}
+			else if (peventdata->name == "set_MP")
+			{
+				if (pEntity == NULL)
+				{
+					if (isDebugEnabled())
+					{
+						sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT (ENTITY NOT FOUND), EntityID: %d, peventdata->name: %s\n", (int)eid, peventdata->name.c_str());
+						kbengine_PrintMessage(str);
+					}
+					break;
+				}
+
+				int32_t v = root[1].asInt();
+				pEntity->setMP(v);
+				onMPChanged(eid, v);
+
+				if (isDebugEnabled())
+				{
+					sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT, EntityID: %d, peventdata->name: %s, MP: %d\n", (int)eid, peventdata->name.c_str(), (int)v);
 					kbengine_PrintMessage(str);
 				}
 			}
@@ -717,22 +784,25 @@ void TheWorld_ClientApp::client_onEvent(const KBEngine::EventData* lpEventData)
 				bool bPlayer = false;
 				KBEntity* attacker = getEntity(attackerID, bPlayer);
 				KBEntity* receiver = pEntity;
-				KBEngine::ENTITY_ID eidAttacker = 0;
+				//KBEngine::ENTITY_ID eidAttacker = 0;
 
 				if (attacker)
 				{
-					attacker->attack(receiver, skillID, damageType, damage);
+					attacker->attackDamage(receiver, skillID, damageType, damage);
+					onAttackDamage(attackerID, eid, skillID, damageType, damage);
 				}
 
 				if (receiver)
 				{
-					receiver->recvDamage(attacker, skillID, damageType, damage);
 					receiver->setHP(HP);
+					onHPChanged(eid, HP);
+					receiver->recvDamage(attacker, skillID, damageType, damage);
+					onRecvDamage(eid, attackerID, skillID, damageType, damage);
 				}
 
 				if (isDebugEnabled())
 				{
-					sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT, EntityID: %d, peventdata->name: %s, EID Attacker: %d, skillId: %d, damageType: %d, damage: %d, HP: %d\n", (int)eid, peventdata->name.c_str(), (int)eidAttacker, (int)skillID, (int)damageType, (int)damage, (int)HP);
+					sprintf(str, "KBE Event received ==> CLIENT_EVENT_SCRIPT, EntityID: %d, peventdata->name: %s, EID Attacker: %d, skillId: %d, damageType: %d, damage: %d, HP: %d\n", (int)eid, peventdata->name.c_str(), (int)attackerID, (int)skillID, (int)damageType, (int)damage, (int)HP);
 					kbengine_PrintMessage(str);
 				}
 			}

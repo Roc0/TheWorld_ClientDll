@@ -220,11 +220,21 @@ public:
 		m_MPMax = MPMax;
 	}
 
+	void setMP(uint32_t MP)
+	{
+		m_MP = MP;
+	}
+
+	uint32_t getMP(void)
+	{
+		return m_MP;
+	}
+
 	int id()const { return m_eid; }
 
 	bool isPlayer() { return m_bIsPlayer;  }
 
-	void attack(KBEntity* receiver, uint32_t skillID, uint32_t damageType, uint32_t damage);
+	void attackDamage(KBEntity* receiver, uint32_t skillID, uint32_t damageType, uint32_t damage);
 	void recvDamage(KBEntity* attacker, uint32_t skillID, uint32_t damageType, uint32_t damage);
 
 	__declspec(dllexport) void dumpStatus(int idx, bool minidump);

@@ -16,7 +16,7 @@ KBEntity::~KBEntity()
 {
 }
 
-void KBEntity::attack(KBEntity * receiver, uint32_t skillID, uint32_t damageType, uint32_t damage)
+void KBEntity::attackDamage(KBEntity * receiver, uint32_t skillID, uint32_t damageType, uint32_t damage)
 {
 }
 
